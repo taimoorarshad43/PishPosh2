@@ -9,4 +9,6 @@
 *key.*
 .env
 *node_modules*
+*package-lock.json
 *package-lock.json*
+react/package-lock.json
