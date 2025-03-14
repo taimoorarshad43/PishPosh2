@@ -35,6 +35,17 @@ def getproducts():
 
     return jsonify(Products=products)
 
+@apiroutes.route('/productimages')
+def getproductsimages():
+
+    sqlaproducts = Product.query.all()
+    for product in sqlaproducts:
+        product.image = product.decode_image()
+    params = ['productid', 'productname', 'productdescription', 'price', 'user_id', 'image']
+    products = [serialize(product, params) for product in sqlaproducts]
+
+    return jsonify(Products=products)
+
 @apiroutes.route('/products/<productid>')
 def getsingleproduct(productid):
 

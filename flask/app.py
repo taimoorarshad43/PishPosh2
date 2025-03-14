@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 
@@ -20,14 +21,15 @@ load_dotenv()                               # Load environmental variables
 # Creating an application factory
 def create_app(db_uri):                                 # Having the db_uri as an argument allows us to pass in different databases for testing/configuration
     app = Flask(__name__)
+    CORS(app)                                           # Enable CORS for the app for all routes
 
     with app.app_context(): # Need this for Flask 3
         connect_db(app, db_uri)
 
     return app
 
-db_uri = os.environ.get("SUPABASE_DATABASE_URI")
-# db_uri = "postgresql:///pishposh"
+# db_uri = os.environ.get("SUPABASE_DATABASE_URI")
+db_uri = "postgresql:///pishposh"
 # db_uri = "postgresql:///unittest_debugging_test"
 
 app = create_app(db_uri)
