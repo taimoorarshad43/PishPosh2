@@ -1,33 +1,25 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
-
-// // Temp product data
-// const test_products = [
-//   {
-//     productid: 1,
-//     productname: 'Example Product',
-//     image: '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFhUXGBgYFxgYGBgYGhgYFxgYGBcYFxgYHSggGBolHRgVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGxAQGy0lHyUt'
-//   }]
+import { data } from 'react-router-dom';
 
 const IndexPage = () => {
+
+  // Set products to be an empty array that we'll populate with an axios.get() call
+  const [products, setProducts] = useState([]);
 
   // Function to get products from our Flask API
   const getProducts = async () => {
     try{
-      const response = await axios.get('http://127.0.0.1:5000/v1/products');
+      const response = await axios.get('http://127.0.0.1:5000/v1/productimages');
       const data  = await response.data;
-      console.log(data);
-      return data;
+      setProducts(data.Products);
     } catch (error)
     {
       console.log(error);
     }
   }
-
-  let products = getProducts();
-
-  console.log(products);
+  getProducts();
 
   // Return JSX that lists the products from our database. 
   // I'll need to figure out pagination for this however.
@@ -49,7 +41,7 @@ const IndexPage = () => {
                     <br />
                   </>
                 )}
-                <Button variant="primary" href={`/product/${product.productid}`}>
+                <Button className = "mt-4" variant="primary" href={`/product/${product.productid}`}>
                   {product.productname}
                 </Button>
               </Col>
@@ -65,7 +57,7 @@ const IndexPage = () => {
       <Container className="text-center mt-5 mb-5">
         {products && products.length > 0 ? (
           <span>
-            <Button variant="primary" className="mr-5" href="/?page=previous">
+            <Button variant="primary" className="mr-5" href="/?page=previous"> {/* Might need to put the full URL here for pagination to work */}
               Previous Page
             </Button>
             <Button variant="primary" className="ml-5" href="/?page=next">

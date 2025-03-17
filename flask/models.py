@@ -118,6 +118,7 @@ class Product(db.Model):
             return self.image.decode('utf-8')
 
         return None
+    
 
 class Tag(db.Model):
 

@@ -7,6 +7,7 @@ import IndexPage from './Index'
 import Signup from './Signup'
 import Login from './Login'
 import Cart from './Cart'
+import ProductDetail from './ProductDetail'
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
           <Route path = "/login" element = {<Login/>}></Route>
           <Route path = "/signup" element = {<Signup/>}></Route>
           <Route path = "/cart" element = {<Cart/>}></Route>
+          <Route path = "/product/:productid" element = {<ProductDetail/>}></Route>
           {/* <Route path = "/userdetail" element = {<UserDetail/>}></Route> */}
         </Routes>
       </BrowserRouter>

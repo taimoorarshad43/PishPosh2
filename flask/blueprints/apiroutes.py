@@ -35,6 +35,15 @@ def getproducts():
 
     return jsonify(Products=products)
 
+@apiroutes.route('/products/<productid>')
+def getsingleproduct(productid):
+
+    product = Product.query.get(productid)
+    params = ['productid', 'productname', 'productdescription', 'price', 'user_id']
+    product = serialize(product, params)
+
+    return jsonify(Product=product)
+
 @apiroutes.route('/productimages')
 def getproductsimages():
 
@@ -46,12 +55,24 @@ def getproductsimages():
 
     return jsonify(Products=products)
 
-@apiroutes.route('/products/<productid>')
-def getsingleproduct(productid):
+@apiroutes.route('/productsimages/<productid>')
+def getsingleproductimages(productid):
 
     product = Product.query.get(productid)
-    params = ['productid', 'productname', 'productdescription', 'price', 'user_id']
-    product = serialize(product, params)
+    username = product.user.username
+    product.username = username
+    product.image = product.decode_image()
+    params = ['productid', 'productname', 'productdescription', 'price', 'image', 'user_id', 'user.username']
+
+    mapper = inspect(product)
+    output = {}
+
+    for column in mapper.attrs:
+        if column.key in params:
+            output[column.key] = getattr(product, column.key)
+    
+    output['username'] = username
+    product = output
 
     return jsonify(Product=product)
 
