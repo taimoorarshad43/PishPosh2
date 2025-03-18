@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import { data } from 'react-router-dom';
 
@@ -9,17 +9,21 @@ const IndexPage = () => {
   const [products, setProducts] = useState([]);
 
   // Function to get products from our Flask API
-  const getProducts = async () => {
-    try{
-      const response = await axios.get('http://127.0.0.1:5000/v1/productimages');
-      const data  = await response.data;
-      setProducts(data.Products);
-    } catch (error)
-    {
-      console.log(error);
-    }
+  useEffect(() => {
+    const getProducts = async () => {
+      try{
+        const response = await axios.get('http://127.0.0.1:5000/v1/productimages');
+        const data  = await response.data;
+        setProducts(data.Products);
+      } catch (error)
+      {
+        console.log(error);
+      }
+    };
+
+    getProducts();
   }
-  getProducts();
+  , []);
 
   // Return JSX that lists the products from our database. 
   // I'll need to figure out pagination for this however.
