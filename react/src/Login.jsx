@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   // Define state for form fields and any validation errors.
@@ -7,7 +9,9 @@ const Login = () => {
     username: '',
     password: ''
   });
+  // Set error fields.
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Update state on input change.
   const handleChange = (e) => {
@@ -29,13 +33,27 @@ const Login = () => {
     if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.password) newErrors.password = 'Password is required';
 
+    // Will append errors to the form and return if we're missing any fields.
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // Submit form data to your API (using fetch/axios).
-    console.log('Submitting form:', formData);
+    // Submit form data to API using axios.
+    axios.post('http://localhost:5000/login', formData).then((response) => {
+      if(response.data){
+        // Redirect to the homepage after login if user is authenticated.
+        navigate('/');
+      }else{
+        // Handle any errors here, such as displaying a notification to the user.
+        setErrors({username: 'Invalid Username or Password', password: 'Invalid Username or Password'});
+      }
+
+    }
+    ).catch((error) => {
+      console.error('Error:', error);
+      // Handle any errors here, such as displaying a notification to the user.
+    });
 
   };
 

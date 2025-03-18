@@ -1,6 +1,6 @@
-from flask import Blueprint, session, render_template, redirect, flash
+from flask import Blueprint, session, render_template, redirect, flash, request, jsonify
 from models import User, db
-from forms import SignUpForm, LoginForm, ProductUploadForm
+from forms import SignUpForm, ProductUploadForm
 from sqlalchemy.exc import IntegrityError
 
 userroutes = Blueprint("userroutes", __name__)
@@ -93,29 +93,49 @@ def signup():
     else:                              # Handles our GET requests
         return render_template('signup.html', form = signinform)
     
-@userroutes.route('/login', methods = ['GET', 'POST'])
+# @userroutes.route('/login', methods = ['GET', 'POST'])
+# def login():
+
+#     loginform = LoginForm()
+
+#     if loginform.validate_on_submit(): # Handles our POST requests
+
+#         username = loginform.username.data
+#         password = loginform.password.data
+#         user = User.authenticate(username, password)
+
+#         if user:                       # With valid user redirect to index and add userid (and other attributes) to session object
+#             session['userid'] = user.id
+#             session['username'] = user.username
+#             session['userfirstname'] = user.firstname
+#             session['userlastname']= user.lastname
+
+#             return redirect('/')
+#         else:
+#             loginform.username.errors.append('Incorrect Username/Password combination')
+#             return render_template('login.html', form=loginform)
+#     else:                              # Handles our GET requests
+#         return render_template('login.html', form = loginform)
+
+@userroutes.route('/login', methods = ['POST'])
 def login():
 
-    loginform = LoginForm()
+    """
+    Gets a username and password from the form and authenticates.
 
-    if loginform.validate_on_submit(): # Handles our POST requests
+    Returns a user if the user is authenticated, otherwise returns False.
+    """
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
 
-        username = loginform.username.data
-        password = loginform.password.data
-        user = User.authenticate(username, password)
+    # If we have a valid user, then we will return the user's username otherwise it will return False
+    user = User.authenticate(username, password)
+    if(user):
+        user = user.username
 
-        if user:                       # With valid user redirect to index and add userid (and other attributes) to session object
-            session['userid'] = user.id
-            session['username'] = user.username
-            session['userfirstname'] = user.firstname
-            session['userlastname']= user.lastname
+    return jsonify(user)
 
-            return redirect('/')
-        else:
-            loginform.username.errors.append('Incorrect Username/Password combination')
-            return render_template('login.html', form=loginform)
-    else:                              # Handles our GET requests
-        return render_template('login.html', form = loginform)
     
 @userroutes.route('/logout')
 def logout():
