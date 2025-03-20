@@ -49,73 +49,107 @@ def userdetail():
         flash('Please login to view your profile', 'btn-info')
         return redirect('/')
 
-@userroutes.route('/signup', methods = ['GET', 'POST'])
+# @userroutes.route('/signup', methods = ['GET', 'POST'])
+# def signup():
+
+#     signinform = SignUpForm()
+
+#     if signinform.validate_on_submit(): # Handles our POST requests
+#         username = signinform.username.data
+#         password = signinform.password.data
+#         firstname = signinform.firstname.data
+#         lastname = signinform.lastname.data
+
+#         ####################### Validation of user input #################################
+#         if len(username) < 4:
+#             signinform.username.errors.append("Username must be at least 4 characters long")
+#             return render_template('signup.html', form = signinform)
+#         if len(password) <= 6:
+#             signinform.password.errors.append("Password must be at least 6 characters long")
+#             return render_template('signup.html', form = signinform)
+#         if len(firstname) == 0:
+#             signinform.firstname.errors.append("You need to add your first name")
+#             return render_template('signup.html', form = signinform)
+#         ##################################################################################
+
+#         user = User.hashpassword(username, password, firstname, lastname)
+
+#         db.session.add(user)
+#         try:                            # Handles the possibility that the username is already taken
+#             db.session.commit()
+#         except IntegrityError:
+#             signinform.username.errors.append("Username already taken")
+#             return render_template('signup.html', form = signinform) # Return to GET route of signin
+
+#         session['userid'] = user.id
+#         session['username'] = user.username
+#         session['userfirstname'] = user.firstname
+#         session['userlastname']= user.lastname
+
+#         flash("Sign Up Successful!", 'btn-success')
+
+#         return redirect('/')
+
+#     else:                              # Handles our GET requests
+#         return render_template('signup.html', form = signinform)
+    
+@userroutes.route('/signup', methods = ['POST'])
 def signup():
 
-    signinform = SignUpForm()
+    """
+    Will add a new user with username and hashed password.
 
-    if signinform.validate_on_submit(): # Handles our POST requests
-        username = signinform.username.data
-        password = signinform.password.data
-        firstname = signinform.firstname.data
-        lastname = signinform.lastname.data
+    If username is taken or there are issues with the inputted  field, will return an array of errors
+    and no user.
+    """
 
-        ####################### Validation of user input #################################
-        if len(username) < 4:
-            signinform.username.errors.append("Username must be at least 4 characters long")
-            return render_template('signup.html', form = signinform)
-        if len(password) <= 6:
-            signinform.password.errors.append("Password must be at least 6 characters long")
-            return render_template('signup.html', form = signinform)
-        if len(firstname) == 0:
-            signinform.firstname.errors.append("You need to add your first name")
-            return render_template('signup.html', form = signinform)
-        ##################################################################################
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+    firstname = data['firstname']
+    lastname = data['lastname']
 
-        user = User.hashpassword(username, password, firstname, lastname)
+    # Blank array of errors to append to if there are any issues with the inputted fields
+    errors = {
+        "firstname": [],
+        "lastname": [],
+        "username": [],
+        "password": []
+    }
 
-        db.session.add(user)
-        try:                            # Handles the possibility that the username is already taken
-            db.session.commit()
-        except IntegrityError:
-            signinform.username.errors.append("Username already taken")
-            return render_template('signup.html', form = signinform) # Return to GET route of signin
+    ####################### Validation of user input #################################
+    if len(username) < 4:
+        errors['username'].append("Username must be at least 4 characters long")
+    if len(password) <= 6:
+        errors['password'].append("Password must be at least 6 characters long")
+    if len(firstname) == 0:
+        errors['firstname'].append("You need to add your first name")
+    ##################################################################################
 
-        session['userid'] = user.id
-        session['username'] = user.username
-        session['userfirstname'] = user.firstname
-        session['userlastname']= user.lastname
+    if errors['username'] or errors['password'] or errors['firstname']: # If any of our errors are populated then return with errors and no user
+        output = {
+            "user": False,
+            "errors": errors
+        }
+        return jsonify(output)
 
-        flash("Sign Up Successful!", 'btn-success')
+    user = User.hashpassword(username, password, firstname, lastname)
 
-        return redirect('/')
+    db.session.add(user)
+    try:                            # Handles the possibility that the username is already taken
+        db.session.commit()
+        payload = user.username
+    except IntegrityError:
+        errors['username'].append("Username already taken")
+        payload = False
 
-    else:                              # Handles our GET requests
-        return render_template('signup.html', form = signinform)
+    output = {
+        "user": payload,
+        "errors": errors
+    }
+
+    return jsonify(output)
     
-# @userroutes.route('/login', methods = ['GET', 'POST'])
-# def login():
-
-#     loginform = LoginForm()
-
-#     if loginform.validate_on_submit(): # Handles our POST requests
-
-#         username = loginform.username.data
-#         password = loginform.password.data
-#         user = User.authenticate(username, password)
-
-#         if user:                       # With valid user redirect to index and add userid (and other attributes) to session object
-#             session['userid'] = user.id
-#             session['username'] = user.username
-#             session['userfirstname'] = user.firstname
-#             session['userlastname']= user.lastname
-
-#             return redirect('/')
-#         else:
-#             loginform.username.errors.append('Incorrect Username/Password combination')
-#             return render_template('login.html', form=loginform)
-#     else:                              # Handles our GET requests
-#         return render_template('login.html', form = loginform)
 
 @userroutes.route('/login', methods = ['POST'])
 def login():

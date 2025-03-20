@@ -26,6 +26,25 @@ def getsingleuser(userid):
 
     return jsonify(User=user)
 
+@apiroutes.route('/users/<userid>/products')
+def getsingleuserproducts(userid):
+
+    user = User.query.get(userid)
+
+    userproducts = []
+
+    for product in user.products: # Get all user products to list on page
+        product.image = product.decode_image()
+        userproducts.append(product)
+
+    params = ['id', 'username', 'firstname', 'lastname']
+    user = serialize(user, params)
+
+    products = [serialize(product, ['productid', 'productname', 'productdescription', 'price', 'user_id', 'image']) for product in userproducts]
+    user['products'] = products
+
+    return jsonify(User=user)
+
 @apiroutes.route('/products')
 def getproducts():
 
@@ -47,6 +66,10 @@ def getsingleproduct(productid):
 @apiroutes.route('/productimages')
 def getproductsimages():
 
+    """
+    Route to get all products with their images decoded
+    """
+
     sqlaproducts = Product.query.all()
     for product in sqlaproducts:
         product.image = product.decode_image()
@@ -57,6 +80,10 @@ def getproductsimages():
 
 @apiroutes.route('/productsimages/<productid>')
 def getsingleproductimages(productid):
+
+    """
+    Route to get a single product with its image decoded
+    """
 
     product = Product.query.get(productid)
     username = product.user.username

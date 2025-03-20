@@ -8,6 +8,8 @@ import Signup from './Signup'
 import Login from './Login'
 import Cart from './Cart'
 import ProductDetail from './ProductDetail'
+import UserDetail from './UserDetail'
+import User from './User'
 
 function App() {
 
@@ -41,7 +43,8 @@ function App() {
           <Route path = "/signup" element = {<Signup/>}></Route>
           <Route path = "/cart" element = {<Cart/>}></Route>
           <Route path = "/product/:productid" element = {<ProductDetail/>}></Route>
-          {/* <Route path = "/userdetail" element = {<UserDetail/>}></Route> */}
+          <Route path = "/user/:userid" element = {<User/>}></Route>
+          <Route path = "/userdetail" element = {<UserDetail/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>
