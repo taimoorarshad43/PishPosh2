@@ -3,6 +3,7 @@ anyio==4.6.2.post1
 appdirs==1.4.4
 appnope==0.1.4
 asttokens==2.4.1
+async-timeout==5.0.1
 attrs==21.2.0
 backcall==0.2.0
 bcrypt==4.2.0
@@ -10,6 +11,7 @@ beautifulsoup4==4.10.0
 beniget==0.4.1
 blinker==1.8.2
 Brotli==1.0.9
+cachelib==0.13.0
 certifi==2024.8.30
 cffi==1.17.1
 chardet==4.0.0
@@ -29,6 +31,7 @@ Flask==3.0.3
 Flask-Bcrypt==1.0.1
 flask-cors==5.0.1
 Flask-DebugToolbar==0.16.0
+Flask-Session==0.8.0
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.1
 fonttools==4.29.1
@@ -63,6 +66,7 @@ matplotlib-inline==0.1.7
 mistralai==1.1.0
 more-itertools==8.10.0
 mpmath==0.0.0
+msgspec==0.19.0
 mypy-extensions==1.0.0
 netifaces==0.11.0
 numpy==1.21.5
@@ -92,6 +96,7 @@ python-dotenv==1.0.1
 pythran==0.10.0
 pytz==2022.1
 PyYAML==5.4.1
+redis==5.2.1
 requests==2.32.3
 scipy==1.8.0
 SecretStorage==3.3.1

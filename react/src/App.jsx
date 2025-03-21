@@ -1,7 +1,9 @@
 // import { useState } from 'react'
 
-import { BrowserRouter, Link, Route, Routes, Router, Outlet } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes, Router, Outlet, useLocation } from 'react-router-dom'
 import { Navbar, Nav, Container } from 'react-bootstrap'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 import IndexPage from './Index'
 import Signup from './Signup'
@@ -13,16 +15,35 @@ import User from './User'
 
 function App() {
 
-  const user = null; // temp until we can get user data
+  const [userid, setUserid] = useState(null);
+  const location = useLocation(); // Using this to get the current location and rerender the page when the location changes
+
+  useEffect(() => {
+    const getUser = async () => {
+      const response = await axios.get(`http://localhost:5000/@me`, {}, {withCredentials: true});
+      if (response) {
+          // Response will either be a userid or not authorized
+          const data = await response.data.User;
+          console.log(data);
+          setUserid(data);
+      }else{
+          console.error('Error fetching user data');
+      }
+    }
+    getUser();
+  }
+  , [location]);
+
+  console.log(`The userid we got back was ${userid}`);
 
   return (
     <div className = "App">
-      <BrowserRouter>
+      {/* <BrowserRouter> */}
         <Navbar bg="primary" variant="light" className="justify-content-between">
           <Container>
             <Navbar.Brand as={Link} to="/" className = "text-light">PishPosh</Navbar.Brand>
             <Nav className="ms-auto">
-              {user ? (
+              {userid ? (
                 <>
                   <Nav.Link as={Link} to="/cart" className = "text-light">View Cart</Nav.Link>
                   <Nav.Link as={Link} to="/userdetail" className = "text-light">View Profile</Nav.Link>
@@ -46,9 +67,9 @@ function App() {
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail/>}></Route>
         </Routes>
-      </BrowserRouter>
+      {/* </BrowserRouter> */}
     </div>
   )
 }
 
-export default App
+export default App;

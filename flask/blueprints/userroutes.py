@@ -164,9 +164,13 @@ def login():
     password = data['password']
 
     # If we have a valid user, then we will return the user's username otherwise it will return False
+    # We'll also add to session the userid
     user = User.authenticate(username, password)
     if(user):
+        session['userid'] = user.id
         user = user.username
+    
+    print("From /login route", session['userid'])
 
     return jsonify(user)
 
@@ -205,5 +209,26 @@ def deleteuser(userid):
     session.pop['username', None]
 
     return redirect('/')
+
+@userroutes.route('/@me')
+def me():
+
+    """
+    A route for a React frontend to check if a user is logged in and get their user information.
+    """
+
+    userid = session.get('userid', None)
+
+    print("From /@me route", userid)
+
+    if not userid:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Since we have a userid in session via logging in we dont need to check if the userid exists - that was already done
+    user = User.query.filter_by(id=userid).first()
+    return jsonify({
+        "id": user.id
+    }) 
+
 
 ################################################################################################################################################

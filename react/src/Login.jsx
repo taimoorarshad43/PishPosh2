@@ -40,10 +40,11 @@ const Login = () => {
     }
 
     // Submit form data to API using axios.
-    axios.post('http://localhost:5000/login', formData).then((response) => {
+    axios.post('http://localhost:5000/login', formData, {withCredentials:true}).then((response) => {
       if(response.data){
         // Redirect to the homepage after login if user is authenticated.
-        navigate('/');
+        console.log(response.data);
+        navigate('/', {replace: true});
       }else{
         // Handle any errors here, such as displaying a notification to the user.
         setErrors({username: 'Invalid Username or Password', password: 'Invalid Username or Password'});
