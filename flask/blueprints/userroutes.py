@@ -171,6 +171,8 @@ def login():
     if(user):
         session['userid'] = user.id
         user = user.username
+    else:
+        return jsonify("null")
     
     print("From /login route", session['userid'])
 

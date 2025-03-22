@@ -41,7 +41,7 @@ const Login = () => {
 
     // Submit form data to API using axios.
     axios.post('http://127.0.0.1:5000/login', formData, {withCredentials:true}).then((response) => {
-      if(response.data){
+      if(response.data !== "null"){
         // Redirect to the homepage after login if user is authenticated.
         console.log(`From Login.jsx - Logging in with ${response.data}`);
         navigate('/', {replace: true});
