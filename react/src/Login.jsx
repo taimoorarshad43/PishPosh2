@@ -43,7 +43,7 @@ const Login = () => {
     axios.post('http://127.0.0.1:5000/login', formData, {withCredentials:true}).then((response) => {
       if(response.data){
         // Redirect to the homepage after login if user is authenticated.
-        console.log(response.data);
+        console.log(`From Login.jsx - Logging in with ${response.data}`);
         navigate('/', {replace: true});
       }else{
         // Handle any errors here, such as displaying a notification to the user.

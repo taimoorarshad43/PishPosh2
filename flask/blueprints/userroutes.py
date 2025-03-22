@@ -1,4 +1,4 @@
-from flask import Blueprint, session, render_template, redirect, flash, request, jsonify
+from flask import Blueprint, session, render_template, redirect, flash, request, jsonify, make_response
 from flask_cors import cross_origin
 from models import User, db
 from forms import SignUpForm, ProductUploadForm
@@ -177,7 +177,8 @@ def login():
     return jsonify(user)
 
     
-@userroutes.route('/logout')
+@userroutes.route('/logout', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def logout():
 
     # When you log out, remove userid from session and clear cart from session
@@ -192,26 +193,13 @@ def logout():
 
     session.clear()
 
-    flash("You are no longer logged in", 'btn-success')
+    print("From /logout route", session.get('userid', None))
 
-    return redirect('/')
+    resp = make_response(jsonify("Logged out"))
+    resp.delete_cookie('userid')
+
+    return resp
     
-# TODO: Delete User route - need to test this
-    
-@userroutes.route('/user/<int:userid>/delete')
-def deleteuser(userid):
-
-    User.query.get(userid).delete()
-    db.session.commit()
-
-    # Should delete all products associated with user as well
-
-    # Should remove userid from session as well.
-
-    session.pop['username', None]
-
-    return redirect('/')
-
 @userroutes.route('/@me')
 @cross_origin(supports_credentials=True)
 def me():
@@ -225,13 +213,29 @@ def me():
     print("From /@me route", userid)
 
     if not userid:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"id": "null"}), 401
     
     # Since we have a userid in session via logging in we dont need to check if the userid exists - that was already done
     # user = User.query.filter_by(id=userid).first()
     return jsonify({
         "id": userid
-    }) 
+    })
+
+# TODO: Delete User route - need to test this
+
+@userroutes.route('/user/<int:userid>/delete')
+def deleteuser(userid):
+
+    User.query.get(userid).delete()
+    db.session.commit()
+
+    # Should delete all products associated with user as well
+
+    # Should remove userid from session as well.
+
+    session.pop['username', None]
+
+    return redirect('/')
 
 
 ################################################################################################################################################

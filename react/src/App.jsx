@@ -1,6 +1,6 @@
 // import { useState } from 'react'
 
-import { BrowserRouter, Link, Route, Routes, Router, Outlet, useLocation } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes, Router, Outlet, useLocation, useNavigate, replace } from 'react-router-dom'
 import { Navbar, Nav, Container } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -16,15 +16,23 @@ import User from './User'
 function App() {
 
   const [userid, setUserid] = useState(null);
-  const location = useLocation(); // Using this to get the current location and rerender the page when the location changes
+  const location = useLocation(); // Using this to change locations and force rerender from when we use Login.jsx
+  const navigate = useNavigate();
+
+  // Will use this to logout the user - no need for a dedicated component
+  const logout = async () => {
+    await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
+    setUserid(null);
+    navigate('/', {replace: true});
+  }
 
   useEffect(() => {
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
           // Response will either be a userid or not authorized
-          const data = await response.data;
-          console.log(data);
+          const data = await response.data.id;
+          console.log(`From App useEffect() - the data is ${data}`);
           setUserid(data);
       }else{
           console.error('Error fetching user data');
@@ -34,7 +42,7 @@ function App() {
   }
   , [location]);
 
-  console.log(`The userid we got back was ${userid}`);
+  console.log(`From App.jsx - The userid we got back was ${userid}`);
 
   return (
     <div className = "App">
@@ -47,7 +55,7 @@ function App() {
                 <>
                   <Nav.Link as={Link} to="/cart" className = "text-light">View Cart</Nav.Link>
                   <Nav.Link as={Link} to="/userdetail" className = "text-light">View Profile</Nav.Link>
-                  <Nav.Link as={Link} to="/logout" className = "text-light">Logout</Nav.Link>
+                  <Nav.Link as={Link} onClick={logout} className="text-light">Logout</Nav.Link>
                 </>
               ) : (
                 <>
