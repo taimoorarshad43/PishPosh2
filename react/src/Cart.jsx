@@ -1,8 +1,25 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Badge, Button, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const Cart = ({ user, products, subtotal }) => {
+const Cart = ({user}) => {
+
+  const [products, setProducts] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
+
+  // Get product data from cart endpoint
+  useEffect(() => {
+    const response = axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
+    const data = response.data;
+    console.log(`From Cart.jsx - the data is ${data}`);
+    if(response){
+      setProducts(data.products);
+    }else{
+      console.error('Error fetching cart data');
+    }
+  }, []);
+
   return (
     <Container className="mt-3 ml-3">
       <h1 className="ml-3 mt-3">
