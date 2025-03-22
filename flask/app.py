@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 import redis
@@ -23,7 +23,6 @@ load_dotenv()                               # Load environmental variables
 # Creating an application factory
 def create_app(db_uri):                                 # Having the db_uri as an argument allows us to pass in different databases for testing/configuration
     app = Flask(__name__)
-    CORS(app)                                           # Enable CORS for the app for all routes
 
     with app.app_context(): # Need this for Flask 3
         connect_db(app, db_uri)
@@ -44,11 +43,15 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 ########### Test Session for Redis ###########
 
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
+app.config['SESSION_TYPE'] = 'filesystem' # 'redis'
+# app.config['SESSION_PERMANENT'] = False
+# app.config['SESSION_USE_SIGNER'] = True
+# app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
+# app.config['SESSION_COOKIE_SECURE'] = True # uses https or not
+# app.config['SESSION_COOKIE_SAMESITE'] = 'None' # cookie will be sent to another origin(client)
 server_session = Session(app)
+CORS(app)                                           # Enable CORS for the app for all routes
+
 
 ###############################################
 

@@ -20,10 +20,10 @@ function App() {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await axios.get(`http://localhost:5000/@me`, {}, {withCredentials: true});
+      const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
           // Response will either be a userid or not authorized
-          const data = await response.data.User;
+          const data = await response.data;
           console.log(data);
           setUserid(data);
       }else{

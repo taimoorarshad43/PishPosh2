@@ -1,4 +1,5 @@
 from flask import Blueprint, session, render_template, redirect, flash, request, jsonify
+from flask_cors import cross_origin
 from models import User, db
 from forms import SignUpForm, ProductUploadForm
 from sqlalchemy.exc import IntegrityError
@@ -152,6 +153,7 @@ def signup():
     
 
 @userroutes.route('/login', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def login():
 
     """
@@ -211,6 +213,7 @@ def deleteuser(userid):
     return redirect('/')
 
 @userroutes.route('/@me')
+@cross_origin(supports_credentials=True)
 def me():
 
     """
@@ -225,9 +228,9 @@ def me():
         return jsonify({"error": "Unauthorized"}), 401
     
     # Since we have a userid in session via logging in we dont need to check if the userid exists - that was already done
-    user = User.query.filter_by(id=userid).first()
+    # user = User.query.filter_by(id=userid).first()
     return jsonify({
-        "id": user.id
+        "id": userid
     }) 
 
 
