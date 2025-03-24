@@ -13,3 +13,4 @@
 *package-lock.json*
 react/package-lock.json
 *flask_session*
+*flask_session/*
