@@ -15,14 +15,18 @@ import User from './User'
 
 function App() {
 
-  const [userid, setUserid] = useState(null);
+  const [user, setUser] = useState(null);
   const location = useLocation(); // Using this to change locations and force rerender from when we use Login.jsx
   const navigate = useNavigate();
 
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
+<<<<<<< HEAD
     setUserid(null);                  // Will set the userid to null and rerender the page
+=======
+    setUser(null);
+>>>>>>> user_object_login
     navigate('/', {replace: true});
   }
 
@@ -30,10 +34,15 @@ function App() {
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
+<<<<<<< HEAD
           // Response will either be a user object or null
           const data = await response.data.id;
+=======
+          // Response will either be a userid or not authorized
+          const data = await response.data.user;
+>>>>>>> user_object_login
           console.log(`From App useEffect() - the data is ${data}`);
-          setUserid(data);
+          setUser(data);
       }else{
           console.error('Error fetching user data');
       }
@@ -42,7 +51,7 @@ function App() {
   }
   , [location]);
 
-  console.log(`From App.jsx - The userid we got back was ${userid}`);
+  console.log(`From App.jsx - The userid we got back was ${user}`);
 
   return (
     <div className = "App">
@@ -51,7 +60,7 @@ function App() {
           <Container>
             <Navbar.Brand as={Link} to="/" className = "text-light">PishPosh</Navbar.Brand>
             <Nav className="ms-auto">
-              {userid ? (
+              {user ? (
                 <>
                   <Nav.Link as={Link} to="/cart" className = "text-light">View Cart</Nav.Link>
                   <Nav.Link as={Link} to="/userdetail" className = "text-light">View Profile</Nav.Link>
@@ -70,7 +79,7 @@ function App() {
           <Route path = "/" element = {<IndexPage/>}></Route>
           <Route path = "/login" element = {<Login/>}></Route>
           <Route path = "/signup" element = {<Signup/>}></Route>
-          <Route path = "/cart" element = {<Cart/>}></Route>
+          <Route path = "/cart" element = {<Cart {...user}/>}></Route>
           <Route path = "/product/:productid" element = {<ProductDetail/>}></Route>
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail/>}></Route>

@@ -215,12 +215,17 @@ def me():
     print("From /@me route", userid)
 
     if not userid:
-        return jsonify({"id": "null"}), 401
+        return jsonify({"user": "null"}), 401
     
     # Since we have a userid in session via logging in we dont need to check if the userid exists - that was already done
-    # user = User.query.filter_by(id=userid).first()
+    user = User.query.filter_by(id=userid).first()
     return jsonify({
-        "id": userid
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "firstname": user.firstname,
+            "lastname": user.lastname
+        }
     })
 
 # TODO: Delete User route - need to test this

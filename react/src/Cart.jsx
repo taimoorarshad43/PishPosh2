@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Badge, Button, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+<<<<<<< HEAD
 const Cart = ({user}) => {
 
   const [products, setProducts] = useState([]);
@@ -19,11 +20,23 @@ const Cart = ({user}) => {
       console.error('Error fetching cart data');
     }
   }, []);
+=======
+const Cart = (props) => {
+
+  console.log('From Cart.jsx - The user is: ',
+  props);
+  
+  const username = props.username;
+  const firstname = props.firstname;
+  const [products, setProducts] = useState([]);
+
+  // Needs to call the /cart endpoint to get the cart items from Flask session.
+>>>>>>> user_object_login
 
   return (
     <Container className="mt-3 ml-3">
       <h1 className="ml-3 mt-3">
-        {user && user.firstname ? `${user.firstname}'s Cart` : 'Cart'}
+        {firstname ? `${firstname}'s Cart` : 'Cart'}
       </h1>
       {products && products.length > 0 ? (
         <>
