@@ -22,11 +22,7 @@ function App() {
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
-<<<<<<< HEAD
-    setUserid(null);                  // Will set the userid to null and rerender the page
-=======
     setUser(null);
->>>>>>> user_object_login
     navigate('/', {replace: true});
   }
 
@@ -34,13 +30,8 @@ function App() {
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
-<<<<<<< HEAD
-          // Response will either be a user object or null
-          const data = await response.data.id;
-=======
           // Response will either be a userid or not authorized
           const data = await response.data.user;
->>>>>>> user_object_login
           console.log(`From App useEffect() - the data is ${data}`);
           setUser(data);
       }else{
