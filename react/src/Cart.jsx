@@ -8,21 +8,21 @@ const Cart = (props) => {
   console.log('From Cart.jsx - The user is: ',
   props);
 
+  const username = props.username;
+  const firstname = props.firstname;
+  const [products, setProducts] = useState([]);
+
   // Get product data from cart endpoint
   useEffect(() => {
     const response = axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
     const data = response.data;
     console.log(`From Cart.jsx - the data is ${data}`);
-    if(response){
+    if(data.products){
       setProducts(data.products);
     }else{
       console.error('Error fetching cart data');
     }
   }, []);
-  
-  const username = props.username;
-  const firstname = props.firstname;
-  const [products, setProducts] = useState([]);
 
   // Needs to call the /cart endpoint to get the cart items from Flask session.
 

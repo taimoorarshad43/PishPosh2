@@ -23,16 +23,18 @@ function App() {
   const logout = async () => {
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
     setUser(null);
+    console.log('From App.jsx - Logging out');
     navigate('/', {replace: true});
   }
 
+  // Will use this to see if the user is logged in or not
   useEffect(() => {
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
           // Response will either be a userid or not authorized
           const data = await response.data.user;
-          console.log(`From App useEffect() - the data is ${data}`);
+          console.log("From App useEffect() - the data is", data);
           setUser(data);
       }else{
           console.error('Error fetching user data');
@@ -42,7 +44,7 @@ function App() {
   }
   , [location]);
 
-  console.log(`From App.jsx - The userid we got back was ${user}`);
+  console.log("From App.jsx - The userid we got back was ", user);
 
   return (
     <div className = "App">

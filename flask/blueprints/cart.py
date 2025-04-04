@@ -1,5 +1,6 @@
-from flask import Blueprint, session, render_template, redirect, flash
+from flask import Blueprint, session, render_template, redirect, flash, jsonify
 from models import Product
+from flask_cors import cross_origin
 
 cartroutes = Blueprint("cartroutes", __name__)
 
@@ -8,14 +9,15 @@ cartroutes = Blueprint("cartroutes", __name__)
 # TODO: Add quantities to cart
 
 @cartroutes.route('/cart')
+@cross_origin(supports_credentials=True)
 def cart():
 
     userid = session.get('userid', None)
 
+    # If we don't have a userid, then they're not logged in and can't view this route.
     if not userid:
-        flash("Please log in to view your cart", "btn-info")
         productid = session['lastviewedproduct']
-        return redirect(f'/product/{productid}')
+        return jsonify({'status': 'error', 'message': 'Please log in to view your cart'}), 401
 
 
     # Retrieve all product ids that are in the cart session object, if any.
@@ -41,13 +43,18 @@ def cart():
         subtotal += product.price
         session['cart_subtotal'] = subtotal
 
-    return render_template('cart.html', products = products, subtotal = subtotal)
+    print("From /cart route", session.get('cart', None))
+
+    return jsonify({'products': [product.to_dict() for product in products]}), 200
 
 
 @cartroutes.route('/product/<int:productid>/addtocart', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def addtocart(productid):
 
     userid = session.get('userid', None)
+
+    print("From /addtocart route, userid is: ", userid)
 
     if userid:                              # If user is logged in, then they can add to cart
         try:                                # Because we will have nothing in the cart initially, we'll just initialize it in the except block
@@ -57,25 +64,25 @@ def addtocart(productid):
         except:
             session['cart'] = [productid]
 
-        flash('Added to Cart!', 'btn-success')
+        return jsonify({'status': 'success', 'message': 'Added to Cart!'}), 200
 
-        return redirect(f'/product/{productid}')
     else:                                   # If not logged in, they get a message and redirect
-        flash('Please login to add items to your cart', 'btn-danger')
-        return redirect(f'/product/{productid}')
+
+        return jsonify({'status': 'error', 'message': 'Please login to add items to your cart'}), 401
 
 
 @cartroutes.route('/product/<int:productid>/removefromcart', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def removefromcart(productid):
 
     try:                                    # If theres nothing to remove from the cart, then we don't need to do anything
         products = session['cart']
         products.remove(productid)
         session['cart'] = products
-        flash('Removed from Cart!', 'btn-warning')
+        # flash('Removed from Cart!', 'btn-warning')
+        return jsonify({'status': 'success', 'message': 'Removed from Cart!'}), 200
     except:
-        flash('Not in Cart', 'btn-info')
-
-    return redirect(f'/product/{productid}')
+        # flash('Not in Cart', 'btn-info')
+        return jsonify ({'status': 'error', 'message': 'Not in Cart'}), 401
 
 ################################################################################################################################################

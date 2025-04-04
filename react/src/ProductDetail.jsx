@@ -31,36 +31,27 @@ const ProductDetail = () => {
 
   // Handler to add product to the cart using a POST request.
   const handleAddToCart = async () => {
-    try {
-      const response = await fetch(`/product/${productid}/addtocart`, {
-        method: 'POST'
-      });
-      if (response.ok) {
-        console.log('Product added to cart');
-        // Optionally update state or notify the user
-      } else {
-        console.error('Failed to add product to cart');
-      }
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
+    const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/addtocart`, {}, {withCredentials: true});
+    console.log(response);
+    if (response) {
+      console.log('Product added to cart');
+      // Optionally update state or notify the user
+    } else {
+      console.error('Failed to add product to cart');
     }
   };
 
   // Handler to remove product from the cart using a POST request.
   const handleRemoveFromCart = async () => {
-    try {
-      const response = await fetch(`/product/${productid}/removefromcart`, {
-        method: 'POST'
-      });
-      if (response.ok) {
+      const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/removefromcart`, {}, {withCredentials: true});
+      console.log(response);
+      if (response) {
         console.log('Product removed from cart');
         // Optionally update state or notify the user
       } else {
         console.error('Failed to remove product from cart');
       }
-    } catch (error) {
-      console.error('Error removing product from cart:', error);
-    }
+
   };
 
   // If product data hasn't loaded yet, display a loading message.

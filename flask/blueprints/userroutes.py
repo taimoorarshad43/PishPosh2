@@ -169,7 +169,9 @@ def login():
     # We'll also add to session the userid
     user = User.authenticate(username, password)
     if(user):
+        session.permanent = True
         session['userid'] = user.id
+        session.modified = True
         user = user.username
     else:
         return jsonify("null")
@@ -212,7 +214,7 @@ def me():
 
     userid = session.get('userid', None)
 
-    print("From /@me route", userid)
+    print("From /@me route userid is: ", userid)
 
     if not userid:
         return jsonify({"user": "null"}), 401

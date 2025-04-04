@@ -41,19 +41,17 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "seekrat"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-########### Test Session for Redis ###########
+########### Test Session for Server Side Cookies/Redis ###########
 
-app.config['SESSION_TYPE'] = 'filesystem' # 'redis'
+app.config['SESSION_TYPE'] = 'filesystem' # Or could be set to 'redis'
 # app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_COOKIE_PATH'] = '/' # Setting this to have different blueprints persist session correctly.
 # app.config['SESSION_USE_SIGNER'] = True
 # app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
 # app.config['SESSION_COOKIE_SECURE'] = True # uses https or not
 # app.config['SESSION_COOKIE_SAMESITE'] = 'None' # cookie will be sent to another origin(client)
-server_session = Session(app)
-CORS(app)                                           # Enable CORS for the app for all routes
 
-
-###############################################
+####################################################################
 
 app.register_blueprint(apiroutes, url_prefix = "/v1")       # Registering blueprints
 app.register_blueprint(productcheckout)
@@ -64,3 +62,10 @@ app.register_blueprint(uploadroutes)
 app.register_blueprint(indexroutes)
 
 toolbar = DebugToolbarExtension(app)
+
+########### Test Session for Server Side Cookies/Redis ###########
+
+server_session = Session(app)
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173"])             # Enable CORS for the app for all routes
+
+####################################################################
