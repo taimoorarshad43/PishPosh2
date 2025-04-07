@@ -1,28 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UserDetail = ({ userId }) => {
-  // Local state to hold user info and products
-  const [user, setUser] = useState(null);
+const UserDetail = (props) => {
+
+  console.log("From UserDetail.jsx - The props we got back were ", props);
+
   const [products, setProducts] = useState([]);
   // Form state for new product listing
   const [formData, setFormData] = useState({
     productName: '',
     productPrice: '',
+    productDescription: '',
     productImage: null,
   });
   const [errors, setErrors] = useState({});
+  const userId = props.id;
+  const user = props;                                 // Will be passing user object from App.jsx
 
-  // Fetch user details and products on component mount
+  // Fetch user products when the component mounts.
   useEffect(() => {
-    axios
-      .get(`/api/user/${userId}`)
-      .then(response => {
-        // Expecting response.data to have { user, products }
-        setUser(response.data.user);
-        setProducts(response.data.products);
-      })
-      .catch(err => console.error('Error fetching user data:', err));
+    const getProducts = async () => {
+        const response = await axios.get(`http://localhost:5000/v1/users/${userId}/products`);
+        if(response){
+            // Set products with response data.
+            const data = await response.data.User.products;
+            console.log(data);
+            setProducts(data);
+        }else{
+            console.error('Error fetching user data:');
+        }
+    }
+    getProducts();
   }, [userId]);
 
   // Handle form field changes
@@ -68,9 +76,6 @@ const UserDetail = ({ userId }) => {
       });
   };
 
-  // Render loading state if user data isn't fetched yet
-  if (!user) return <div>Loading...</div>;
-
   return (
     <div>
       <h1 className="ml-3 mt-3 mb-5">{user.firstname}'s Profile Page</h1>
@@ -78,7 +83,7 @@ const UserDetail = ({ userId }) => {
         <div className="row text-center">
           {/* Left column: User's products */}
           <div className="col-6">
-            <h2 className="mb-5">{user.fullname}'s Products</h2>
+            <h2 className="mb-5">{user.firstname} {user.lastname}'s Products</h2>
             {products.map(product => (
               <div key={product.productid} className="mb-5">
                 {product.image && (
@@ -87,13 +92,15 @@ const UserDetail = ({ userId }) => {
                       src={`data:image/jpeg;base64,${product.image}`} 
                       alt={product.name} 
                     /><br />
-                    <a className="btn btn-primary" href={`/product/${product.productid}`}>
-                      {product.productname}
-                    </a>
-                    <span className="badge ml-3">Price: ${product.price}.00</span>
-                    <span className="badge ml-3">
-                      <a href={`/product/${product.productid}/delete`}>Delete?</a>
-                    </span>
+                    <div className = "mt-4">
+                      <a className="btn btn-primary" href={`/product/${product.productid}`}>
+                        {product.productname}
+                      </a>
+                      <span className="badge ml-3">Price: ${product.price}.00</span>
+                      <span className="badge ml-3">
+                        <a href={`/product/${product.productid}/delete`}>Delete?</a>
+                      </span>
+                    </div>
                   </>
                 )}
               </div>
@@ -115,6 +122,19 @@ const UserDetail = ({ userId }) => {
                   onChange={handleChange}
                 />
                 {errors.productName && <div>{errors.productName}</div>}
+              </div>
+              <div>
+                <label className="btn-primary mb-3" htmlFor="productDescription">
+                  Product Description
+                </label>
+                <input
+                  type="text"
+                  name="productDescription"
+                  id="productDescription"
+                  value={formData.productDescription}
+                  onChange={handleChange}
+                />
+                {errors.productDescription && <div>{errors.productDescription}</div>}
               </div>
               <div>
                 <label className="btn-primary mb-3" htmlFor="productPrice">
@@ -147,10 +167,10 @@ const UserDetail = ({ userId }) => {
                 value="Confirm?"
               />
               {errors.submit && <div className="error">{errors.submit}</div>}
-            </form>
-            <a className="mb-3 text-primary" href={`/upload/${user.id}/ai`}>
+              <span><a className="ml-3 mt-3 btn btn-primary" href={`/upload/${user.id}/ai`}>
               Add AI description?
-            </a>
+            </a></span>
+            </form>
           </div>
         </div>
       </div>

@@ -27,7 +27,7 @@ function App() {
     navigate('/', {replace: true});
   }
 
-  // Will use this to see if the user is logged in or not
+  // Will use this to see if the user is logged in or not as well as pass in user details to other components
   useEffect(() => {
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
@@ -75,7 +75,7 @@ function App() {
           <Route path = "/cart" element = {<Cart {...user}/>}></Route>
           <Route path = "/product/:productid" element = {<ProductDetail/>}></Route>
           <Route path = "/user/:userid" element = {<User/>}></Route>
-          <Route path = "/userdetail" element = {<UserDetail/>}></Route>
+          <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
         </Routes>
       {/* </BrowserRouter> */}
     </div>
