@@ -7,7 +7,6 @@ const Cart = (props) => {
 
   const username = props.username;
   const firstname = props.firstname;
-  const subtotal = 0;                               //temp for now until we get subtotal from backend.
   const [products, setProducts] = useState([]);
 
   // Get product data from cart endpoint and set products
@@ -33,7 +32,7 @@ console.log("From Cart.jsx - The products we got back were ", products);
       <h1 className="ml-3 mt-3">
         {firstname ? `${firstname}'s Cart` : 'Cart'}
       </h1>
-      {products && Object.keys(products).length > 0 ? (
+      {products && Object.keys(products).length > 1 ? ( // products object from backend will always at least have a subtotal key
         <>
           <Row className="text-center">
             <Col md={8}>
@@ -62,7 +61,7 @@ console.log("From Cart.jsx - The products we got back were ", products);
             </Col>
             <Col md={4}>
               <Badge pill variant="primary">
-                Subtotal: ${subtotal}.00
+                Subtotal: ${products.cart_subtotal}.00
               </Badge>
             </Col>
           </Row>

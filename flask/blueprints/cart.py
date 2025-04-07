@@ -59,8 +59,10 @@ def cart():
             'image': product.decode_image()
         }
 
+    productoutput['cart_subtotal'] = subtotal
+
     # print("From /cart route products are", products)
-    # print("From /cart route product output is", productoutput)    
+    # print("From /cart route product output is", productoutput)
     
     return jsonify(productoutput), 200
 
