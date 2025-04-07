@@ -112,7 +112,7 @@ def serialize(object, params): # Helper function for serializing different SQLA 
     Takes the object to be serialized as well as the params to serialize it with
     """
 
-    # TODO: Refactor to allow SQL relationships
+    # TODO: Refactor to allow SQLA relationships
 
     mapper = inspect(object)
     output = {}

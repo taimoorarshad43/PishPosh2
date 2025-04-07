@@ -5,37 +5,39 @@ import { Link } from 'react-router-dom';
 
 const Cart = (props) => {
 
-  console.log('From Cart.jsx - The user is: ',
-  props);
-
   const username = props.username;
   const firstname = props.firstname;
+  const subtotal = 0;                               //temp for now until we get subtotal from backend.
   const [products, setProducts] = useState([]);
 
-  // Get product data from cart endpoint
+  // Get product data from cart endpoint and set products
   useEffect(() => {
-    const response = axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
-    const data = response.data;
-    console.log(`From Cart.jsx - the data is ${data}`);
-    if(data.products){
-      setProducts(data.products);
-    }else{
-      console.error('Error fetching cart data');
-    }
+    const getProducts = async () => {
+      const response = await axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
+      const data = await response.data;
+      console.log("From Cart.jsx - the data is", data);
+        if(data){
+          setProducts(data);
+        }else{
+          console.error('Error fetching cart data');
+        }
+      }
+    
+    getProducts();
   }, []);
 
-  // Needs to call the /cart endpoint to get the cart items from Flask session.
+console.log("From Cart.jsx - The products we got back were ", products);
 
   return (
     <Container className="mt-3 ml-3">
       <h1 className="ml-3 mt-3">
         {firstname ? `${firstname}'s Cart` : 'Cart'}
       </h1>
-      {products && products.length > 0 ? (
+      {products ? (
         <>
           <Row className="text-center">
             <Col md={8}>
-              {products.map(product => (
+              {Object.values(products).map(product => ( // loop through the product dictionary's values and go from there
                 <div key={product.productid} className="mt-5">
                   {product.image && (
                     <>
