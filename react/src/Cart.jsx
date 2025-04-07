@@ -33,7 +33,7 @@ console.log("From Cart.jsx - The products we got back were ", products);
       <h1 className="ml-3 mt-3">
         {firstname ? `${firstname}'s Cart` : 'Cart'}
       </h1>
-      {products ? (
+      {products && Object.keys(products).length > 0 ? (
         <>
           <Row className="text-center">
             <Col md={8}>
