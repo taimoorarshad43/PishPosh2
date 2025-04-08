@@ -12,6 +12,7 @@ import Cart from './Cart'
 import ProductDetail from './ProductDetail'
 import UserDetail from './UserDetail'
 import User from './User'
+import AIUpload from './AIUpload'
 
 function App() {
 
@@ -76,6 +77,7 @@ function App() {
           <Route path = "/product/:productid" element = {<ProductDetail/>}></Route>
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
+          <Route path = "/upload/:userid/ai" element = {<AIUpload {...user} />}></Route>
         </Routes>
       {/* </BrowserRouter> */}
     </div>
