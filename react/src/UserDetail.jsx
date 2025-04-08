@@ -52,6 +52,7 @@ const UserDetail = (props) => {
     e.preventDefault();
     const data = new FormData();
     data.append('productName', formData.productName);
+    data.append('productDescription', formData.productDescription);
     data.append('productPrice', formData.productPrice);
     if (formData.productImage) {
       data.append('productImage', formData.productImage);
@@ -61,11 +62,6 @@ const UserDetail = (props) => {
       .then(response => {
         // Refresh the product list after successful upload or update error fields if we got any.
         console.log("From UserDetail.jsx - The response we got back was ", response);
-        if (response.data.errors) {
-          setErrors(response.data.errors);
-        } else {
-          setErrors({});
-        }
         return axios.get(`http://localhost:5000/v1/users/${userId}/products`);
       })
       .then(res => {
@@ -78,10 +74,9 @@ const UserDetail = (props) => {
           productImage: null,
         });
       })
-      .catch(err => {
+      .catch(err => {   // We'll get a HTTP 400 if any fields are missing. From there we'll set error messages from the API.
         console.error('Error uploading product:', err);
-        // Update errors state if needed
-        // setErrors({ submit: 'There was an error submitting the form.' }); // Need to rework this
+        setErrors(err.response.data.error);
       });
   };
 
@@ -145,7 +140,7 @@ const UserDetail = (props) => {
                   value={formData.productName}
                   onChange={handleChange}
                 />
-                {errors.productName && <div>{errors.productName}</div>}
+                {errors.productName && <span className = 'text-primary float-right'>{errors.productName}</span>}
               </div>
               <div>
                 <label className="btn-primary mb-3" htmlFor="productDescription">
@@ -158,7 +153,7 @@ const UserDetail = (props) => {
                   value={formData.productDescription}
                   onChange={handleChange}
                 />
-                {errors.productDescription && <div>{errors.productDescription}</div>}
+                {errors.productDescription && <span className = 'text-primary float-right'>{errors.productDescription}</span>}
               </div>
               <div>
                 <label className="btn-primary mb-3" htmlFor="productPrice">
@@ -171,7 +166,7 @@ const UserDetail = (props) => {
                   value={formData.productPrice}
                   onChange={handleChange}
                 />
-                {errors.productPrice && <div>{errors.productPrice}</div>}
+                {errors.productPrice && <span className = 'text-primary float-right'>{errors.productPrice}</span>}
               </div>
               <div>
                 <label className="btn-primary mb-3" htmlFor="productImage">
@@ -183,7 +178,7 @@ const UserDetail = (props) => {
                   id="productImage"
                   onChange={handleChange}
                 />
-                {errors.productImage && <div>{errors.productImage}</div>}
+                {errors.productImage && <span className = 'text-primary float-right'>{errors.productImage}</span>}
               </div>
               <input
                 className="submit-button btn btn-primary mt-3"

@@ -12,63 +12,6 @@ from mistraldescription import getproductdescription, encodeimage, decodeimage
 
 uploadroutes = Blueprint("uploadroutes", __name__)
 
-############################################################## Upload Routes #################################################################
-
-# @uploadroutes.route('/upload/<int:userid>', methods = ['POST'])                 # Route to upload a product, tied to a user
-# def pictureupload(userid):
-
-#     productform = ProductUploadForm()
-
-#     if session.get("userid", None) is None:
-#         flash('Please login to upload products', 'btn-info')
-#         return redirect('/')
-
-#     if productform.validate_on_submit(): # Handles our POST request for the form submission
-#         try:
-#             productname = productform.name.data                    # Refactoring to have WTForms handle the file submission
-#             productdescription = productform.description.data
-#             productprice = productform.price.data
-#             file = productform.image.data
-
-#             file_ext = file.filename.split('.')[-1]                # Check if the file is an image and if its in the accepted formats
-#             print("File ext: ", file_ext)
-#             if file_ext not in ['jpg', 'jpeg', 'png']:
-#                 session['ProductFileError'] = 'Invalid File Type'          # If invalid file type, we'll add an error to session and display it after a redirect
-#             else:
-#                 if file_ext == 'jpg':
-#                     file_ext = 'jpeg'
-
-#             # Generate new product and attach it to passed userid
-#             product = Product(productname = productname, productdescription = productdescription, price = productprice, user_id = userid)
-
-#             image = Image.open(file)
-#             newsize = (200,200)                         # Resizing the image to be compact
-#             image = image.resize(newsize)
-#             stream = io.BytesIO()
-#             image.save(stream, format = file_ext.replace('.','').upper())         # Save the image as stream of bytes 
-#             file = stream.getvalue()
-
-#             # Save the file as base64 encoding to its image filed in DB.
-#             product.encode_image(file)
-
-#             db.session.add(product)
-#             db.session.commit()
-
-#         except Exception as e:                                          # If certain fields are missing, redirect to user detail with flashed message
-#             if not productname or productname.replace("-","").isdigit() == True:
-#                 session['ProductNameError'] = 'Invalid Product Name'
-#             if not productdescription or productname.replace("-","").isdigit() == True:
-#                 session['ProductDescriptionError'] = 'Invalid Product Description'
-#             if not productprice:
-#                 session['ProductPriceError'] = 'Invalid Product Price'
-#             print(e)
-#             flash('Product Upload failed (check required fields)', 'btn-danger')
-#             return redirect(f'/userdetail')
-        
-#     print("if condition failed")
-#     flash('Product Listed Successfully', 'btn-success')
-#     return redirect(f'/user/{userid}')                          # After success, redirect to their user page with their products.
-
 @uploadroutes.route('/upload/<int:userid>', methods = ['POST'])
 @cross_origin(supports_credentials=True)
 def pictureupload(userid):
@@ -86,15 +29,28 @@ def pictureupload(userid):
     productname = data.get("productName", None)
     productdescription = data.get("productDescription", None)
     productprice = data.get("productPrice", None)
-    file = request.files['productImage']                # Get the file from the request object
+    file = request.files.get('productImage', None)                # Get the file from the request object
 
     # Declaring an error dict to add and send back errors if any occur
     errors = {
-        productname: '',
-        productdescription: '',
-        productprice: '',
-        file: ''
+        'productName': '',
+        'productDescription': '',
+        'productPrice': '',
+        'productImage': ''
     }
+
+    if not productname or productname.replace("-","").isdigit() == True:
+        errors['productName'] = 'Invalid Product Name'
+    if not productdescription or productdescription.replace("-","").isdigit() == True:
+        errors['productDescription'] = 'Invalid Product Description'
+    if not productprice or int(productprice) <= 0:
+        errors['productPrice'] = 'Invalid Product Price'
+    if not file:
+        errors['productImage'] = 'Missing Image File'
+
+    if any(errors.values()):                  # If any of the errors are not empty, we return the errors to the client
+        print("Error values are: ", errors.values())
+        return jsonify({"error": errors}), 400
 
     file_ext = file.filename.split('.')[-1]                # Check if the file is an image and if its in the accepted formats
     print("File ext: ", file_ext)
@@ -104,17 +60,8 @@ def pictureupload(userid):
         if file_ext == 'jpg':
             file_ext = 'jpeg'
 
-    if not productname or productname.replace("-","").isdigit() == True:
-        errors['productname'] = 'Invalid Product Name'
-    if not productdescription or productdescription.replace("-","").isdigit() == True:
-        errors['productdescription'] = 'Invalid Product Description'
-    if not productprice:
-        errors['productprice'] = 'Invalid Product Price'
 
-    if any(errors.values()):                  # If any of the errors are not empty, we return the errors to the client
-        return jsonify({"error": errors}), 400
-    
-    
+
     try:                  # Try to commit the product to the database and if not, return errors that might have prevented that
         # Generate new product and attach it to passed userid
         product = Product(productname = productname, productdescription = productdescription, price = productprice, user_id = userid)
