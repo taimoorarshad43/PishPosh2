@@ -100,7 +100,7 @@ def signup():
     """
     Will add a new user with username and hashed password.
 
-    If username is taken or there are issues with the inputted  field, will return an array of errors
+    If username is taken or there are issues with the inputted field, will return an array of errors
     and no user.
     """
 

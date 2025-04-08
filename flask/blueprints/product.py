@@ -1,4 +1,4 @@
-from flask import Blueprint, session, render_template, redirect, flash
+from flask import Blueprint, session, render_template, jsonify
 from models import Product, db
 
 productroutes = Blueprint("productroutes", __name__)
@@ -15,15 +15,12 @@ def getproduct(productid):
 
     return render_template('productdetail.html', product=product)
 
-@productroutes.route('/product/<int:productid>/delete')
+@productroutes.route('/product/<int:productid>/delete', methods = ['DELETE'])
 def deleteproduct(productid):
 
     Product.query.filter_by(productid=productid).delete()
     db.session.commit()
 
-    userid = session['userid']
-
-    flash('Product Deleted', 'btn-danger')
-    return redirect(f'/user/{userid}')
+    return jsonify({'success': True, 'message': 'Product deleted successfully.'}), 200
 
 ################################################################################################################################################

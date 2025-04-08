@@ -20,6 +20,7 @@ const UserDetail = (props) => {
   // Fetch user products when the component mounts.
   useEffect(() => {
     const getProducts = async () => {
+      if (userId){
         const response = await axios.get(`http://localhost:5000/v1/users/${userId}/products`);
         if(response){
             // Set products with response data.
@@ -27,8 +28,11 @@ const UserDetail = (props) => {
             console.log(data);
             setProducts(data);
         }else{
-            console.error('Error fetching user data:');
+            console.error('Error fetching user data');
         }
+      }else{
+        console.log("From UserDetail.jsx - Waiting on userId");
+      }
     }
     getProducts();
   }, [userId]);
@@ -53,12 +57,16 @@ const UserDetail = (props) => {
       data.append('productImage', formData.productImage);
     }
     axios
-      .post(`/upload/${user.id}`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      .post(`http://127.0.0.1:5000/upload/${userId}`, data, {withCredentials: true})
       .then(response => {
-        // Optionally refresh product list after successful upload
-        return axios.get(`/api/user/${userId}`);
+        // Refresh the product list after successful upload or update error fields if we got any.
+        console.log("From UserDetail.jsx - The response we got back was ", response);
+        if (response.data.errors) {
+          setErrors(response.data.errors);
+        } else {
+          setErrors({});
+        }
+        return axios.get(`http://localhost:5000/v1/users/${userId}/products`);
       })
       .then(res => {
         setProducts(res.data.products);
@@ -66,15 +74,28 @@ const UserDetail = (props) => {
         setFormData({
           productName: '',
           productPrice: '',
+          productDescription: '',
           productImage: null,
         });
       })
       .catch(err => {
         console.error('Error uploading product:', err);
         // Update errors state if needed
-        setErrors({ submit: 'There was an error submitting the form.' });
+        // setErrors({ submit: 'There was an error submitting the form.' }); // Need to rework this
       });
   };
+
+  const handleDelete = (productId) => {
+    axios
+      .delete(`http://127.0.0.1:5000/product/${productId}/delete`, null, {withCredentials: true})
+      .then(response => {
+        console.log("From UserDetail.jsx - The response we got back was ", response);
+        setProducts(products.filter(product => product.productid !== productId));           // Deleting product from state
+      })
+      .catch(err => {
+        console.error('Error deleting product:', err);
+      });
+  }
 
   return (
     <div>
@@ -98,7 +119,10 @@ const UserDetail = (props) => {
                       </a>
                       <span className="badge ml-3">Price: ${product.price}.00</span>
                       <span className="badge ml-3">
-                        <a href={`/product/${product.productid}/delete`}>Delete?</a>
+                        {/* <a href={`/product/${product.productid}/delete`}>Delete?</a> */}
+                        <a href="#" onClick={(e) => {
+                            e.preventDefault();                                 // Have this do a POST request to the delete endpoint
+                            handleDelete(product.productid);}}>Delete?</a>
                       </span>
                     </div>
                   </>
