@@ -60,8 +60,6 @@ def pictureupload(userid):
         if file_ext == 'jpg':
             file_ext = 'jpeg'
 
-
-
     try:                  # Try to commit the product to the database and if not, return errors that might have prevented that
         # Generate new product and attach it to passed userid
         product = Product(productname = productname, productdescription = productdescription, price = productprice, user_id = userid)
@@ -86,22 +84,15 @@ def pictureupload(userid):
         print(e)
         errors['Misc'] = e
         return jsonify({"error": errors}), 400
-        
 
-@uploadroutes.route('/upload/<int:userid>/ai')
-def uploadai(userid):
-
-    aiform = ProductUploadForm()
-
-    if session.get("userid", None) is None:
-        flash('Please login to upload products', 'btn-info')
-        return redirect('/')
-
-    user = User.query.get_or_404(userid)
-    return render_template('aiupload.html', user=user, form=aiform)
 
 @uploadroutes.route('/upload/aiprocess', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def aiprocess():
+
+    if session.get("userid", None) is None:                       # Shouldn't be able to get here from the standard browser.
+        print("From /upload/ai route - returned here, userid is: ", session.get("userid", None))
+        return jsonify({"error": "Please login to upload products"}), 401
 
     image = request.files['file']
     title_prompt = "Give me a short title for this picture that is 2-5 words long. This title should describe the picture as a product"
@@ -116,6 +107,8 @@ def aiprocess():
 
     output = {"title" : title,
               "description" : description}
+
+    print("From /upload/ai route - output is:", output)
 
     return jsonify(output)
 
@@ -136,50 +129,3 @@ def aiconfirm(userid):
     return render_template('aiconfirm.html', image=img_data_decoded, user=user, title=title, description=description)
 
 ##########################################################################################################################################
-
-
-
-
-
-
-
-
-
-################################# Temporary Back Up #######################################################################
-
-# @uploadroutes.route('/upload/<int:userid>', methods = ['POST'])
-# def pictureupload(userid):
-
-#     if session.get("userid", None) is None:
-#         flash('Please login to upload products', 'btn-info')
-#         return redirect('/')
-
-#     try:
-#         file = request.files['file']
-#         productname = request.form['productname']
-#         productdescription = request.form['productdescription']
-#         productprice = request.form['productprice']
-        
-#         # Generate new product and attach it to passed userid
-#         product = Product(productname = productname, productdescription = productdescription, price = productprice, user_id = userid)
-
-#         image = Image.open(file)
-#         newsize = (200,200) # Resizing the image to be compact
-#         image = image.resize(newsize)
-#         stream = io.BytesIO()
-#         image.save(stream, format = 'JPEG')         # Save the image as stream of bytes
-#         file = stream.getvalue()
-
-#         # Save the file as base64 encoding to its image filed in DB.
-#         product.encode_image(file)
-
-#         db.session.add(product)
-#         db.session.commit()
-
-#     except Exception as e:                                          # If certain fields are missing, redirect to user detail with flashed message
-#         print(e)
-#         flash('Product Upload failed (check required fields)', 'btn-danger')
-#         return redirect(f'/user/{userid}')
-
-#     flash('Product Listed Successfully', 'btn-success')
-#     return redirect(f'/user/{userid}')                          # After success, redirect to their user page with their products.

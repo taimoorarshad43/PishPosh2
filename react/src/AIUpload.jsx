@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const AIUpload = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -8,13 +10,18 @@ const AIUpload = (props) => {
   const [productDesc, setProductDesc] = useState('');
   const [price, setPrice] = useState('');
   const [showFields, setShowFields] = useState(false);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+
+  const userId = props.id; // User ID passed from App.jsx
+  const user = props; // User object passed from App.jsx
 
   // Handle file input change: update preview and send file for processing.
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    setSelectedFile(file);
+    setSelectedFile(file);              //Should trigger a rerender of our component
 
     // Create preview using FileReader.
     const reader = new FileReader();
@@ -29,36 +36,39 @@ const AIUpload = (props) => {
 
     try {
       // Send file to the backend endpoint for AI processing.
-      const response = await axios.post('/upload/aiprocess', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await axios.post(`http://127.0.0.1:5000/upload/aiprocess`, formData, {withCredentials: true});
+      console.log("From AIUpload.jsx - The response we got back was ", response);
       // Populate product fields with the response data.
       setProductTitle(response.data.title || '');
       setProductDesc(response.data.description || '');
       setShowFields(true);
     } catch (error) {
-      console.error('Upload failed:', error);
-      // Optionally, handle the error state and notify the user.
+      console.error('AI Processing failed:', error);
     }
   };
 
-  // Handle final form submission.
+  // Handling final form submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Gather form data. You might need to add additional form fields if required.
-    const data = {
-      productTitle,
-      productDesc,
-      price,
-      // Include other fields as necessary.
-    };
-    try {
-      // Replace the URL with your final submission endpoint.
-      const res = await axios.post(`/upload/${userId}`, data);
-      console.log('Final submission successful:', res.data);
-    } catch (error) {
-      console.error('Final submission failed:', error);
+    // Add form data
+    const data = new FormData();
+    data.append('productName', productTitle);
+    data.append('productDescription', productDesc);
+    data.append('productPrice', price);
+    if (selectedFile) {
+      data.append('productImage', selectedFile);
     }
+    axios
+      .post(`http://127.0.0.1:5000/upload/${userId}`, data, {withCredentials: true})
+      .then(response => {
+        // Refresh the product list after successful upload or update error fields if we got any.
+        console.log("From AIUpload.jsx - The response we got back was ", response);
+        navigate('/userdetail', {replace: true});
+      })
+      .catch(err => {   // We'll get a HTTP 400 if any fields are missing. From there we'll set error messages from the API.
+        console.error('Error uploading product:', err);
+        setErrors(err.response.data.error);
+      });
   };
 
   return (
@@ -100,6 +110,7 @@ const AIUpload = (props) => {
                 value={productTitle}
                 onChange={(e) => setProductTitle(e.target.value)}
               />
+            {errors.productName && <span className = 'text-primary float-right'>{errors.productName}</span>}
             </div>
 
             <div className="form-group mt-3">
@@ -112,6 +123,7 @@ const AIUpload = (props) => {
                 value={productDesc}
                 onChange={(e) => setProductDesc(e.target.value)}
               />
+            {errors.productDescription && <span className = 'text-primary float-right'>{errors.productDescription}</span>}
             </div>
 
             <div className="form-group mt-3">
@@ -125,6 +137,7 @@ const AIUpload = (props) => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
+            {errors.productPrice && <span className = 'text-primary float-right'>{errors.productPrice}</span>}
             </div>
 
             <div className="text-center">
