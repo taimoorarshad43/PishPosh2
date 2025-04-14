@@ -22,8 +22,18 @@ const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JE
 function App() {
 
   const [user, setUser] = useState(null);
+  const [clientSecret, setClientSecret] = useState(''); //Initiializing client secret
   const location = useLocation(); // Using this to change locations and force rerender from when we use Login.jsx
   const navigate = useNavigate();
+
+  // Will use this to get the client secret from the backend and pass to CheckoutComponent
+  useEffect(() => {
+    axios.post('http://127.0.0.1:5000/stripe_key', {}, {withCredentials: true})
+      .then(response => {
+        setClientSecret(response.data);
+        // console.log("From App.jsx - The client secret we got back was ", response.data);
+      });
+  }, []);
 
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
