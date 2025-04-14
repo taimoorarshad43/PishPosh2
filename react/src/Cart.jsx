@@ -73,7 +73,7 @@ console.log("From Cart.jsx - The products we got back were ", products);
             </Col>
           </Row>
         </>
-      ) : (
+      ) : (                                                           // If nothing in cart, then we have this message
         <h4 className="display-4 text-center">Nothing in Cart</h4>
       )}
     </Container>

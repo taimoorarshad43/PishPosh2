@@ -1,9 +1,10 @@
-// import { useState } from 'react'
-
-import { BrowserRouter, Link, Route, Routes, Router, Outlet, useLocation, useNavigate, replace } from 'react-router-dom'
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Navbar, Nav, Container } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 
 import IndexPage from './Index'
 import Signup from './Signup'
@@ -13,6 +14,10 @@ import ProductDetail from './ProductDetail'
 import UserDetail from './UserDetail'
 import User from './User'
 import AIUpload from './AIUpload'
+import CheckoutComponent from './CheckoutComponent';
+
+const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JEt228TH9Mw5vtM3yXryMfcnnOisTAt7rslzRbZDdBcPcxyIruU5400GeH1HxJH');
+// Loading stripe public key outside App component to avoid reinitializing it on every render
 
 function App() {
 
@@ -78,6 +83,13 @@ function App() {
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
           <Route path = "/upload/:userid/ai" element = {<AIUpload {...user} />}></Route>
+
+          <Route
+          path="/checkout"
+          element={
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutComponent/>
+            </Elements>}/>
         </Routes>
       {/* </BrowserRouter> */}
     </div>
