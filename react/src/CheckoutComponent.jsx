@@ -33,11 +33,16 @@ const CheckoutComponent = () => {
 
     if (!stripe || !elements) return;
 
+    // We then want to clear the cart via this endpoint
+    axios.post("http://127.0.0.1:5000/cart/clearall", {}, {withCredentials: true})
+    .then(response => {console.log("From CheckoutComponent.jsx - The response we got back was ", response);})
+    .catch(error => {console.log("From CheckoutComponent.jsx - The error we got back was ", error);})
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Replace with your actual return URL.
-        return_url: 'http://127.0.0.1:5000/confirmation',
+        return_url: 'http://127.0.0.1:5173/confirmation',
       },
     });
 

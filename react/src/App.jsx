@@ -15,6 +15,7 @@ import UserDetail from './UserDetail'
 import User from './User'
 import AIUpload from './AIUpload'
 import CheckoutComponent from './CheckoutComponent';
+import PaymentConfirmation from './PaymentConfirmation';
 
 const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JEt228TH9Mw5vtM3yXryMfcnnOisTAt7rslzRbZDdBcPcxyIruU5400GeH1HxJH');
 // Loading stripe public key outside App component to avoid reinitializing it on every render
@@ -93,13 +94,11 @@ function App() {
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
           <Route path = "/upload/:userid/ai" element = {<AIUpload {...user} />}></Route>
-
-          <Route
-          path="/checkout"
-          element={
+          <Route path="/checkout" element={
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutComponent/>
             </Elements>}/>
+          <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>
         </Routes>
       {/* </BrowserRouter> */}
     </div>

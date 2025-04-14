@@ -1,4 +1,4 @@
-from flask import Blueprint, session, render_template, redirect, flash, jsonify
+from flask import Blueprint, session, jsonify, make_response
 from models import Product
 from flask_cors import cross_origin
 
@@ -103,5 +103,23 @@ def removefromcart(productid):
         return jsonify({'status': 'success', 'message': 'Removed from Cart!'}), 200
     except:
         return jsonify ({'status': 'error', 'message': 'Not in Cart'}), 401
+
+@cartroutes.route('/cart/clearall', methods = ['POST'])
+@cross_origin(supports_credentials=True)
+def clearallfromcart():
+
+    """
+    Route that removes all products from cart session. Called after a checkout is complete.
+    """
+
+    session.pop('cart', None)
+
+    # Make sure we're properly clearing the cart session
+    resp = make_response(jsonify("Cart Session Cleared"))
+    resp.delete_cookie('cart')
+
+    print("From /cart/clearall route, cart session cleared", session.get('cart', None))
+
+    return resp
 
 ################################################################################################################################################
