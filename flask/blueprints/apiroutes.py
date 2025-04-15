@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from flask_cors import cross_origin
 from models import User, Product
 from sqlalchemy import inspect
 
@@ -55,6 +56,7 @@ def getproducts():
     return jsonify(Products=products)
 
 @apiroutes.route('/products/<productid>')
+@cross_origin(supports_credentials=True)
 def getsingleproduct(productid):
 
     product = Product.query.get(productid)
@@ -64,6 +66,7 @@ def getsingleproduct(productid):
     return jsonify(Product=product)
 
 @apiroutes.route('/productimages')
+@cross_origin(supports_credentials=True)
 def getproductsimages():
 
     """
@@ -79,6 +82,7 @@ def getproductsimages():
     return jsonify(Products=products)
 
 @apiroutes.route('/productsimages/<productid>')
+@cross_origin(supports_credentials=True)
 def getsingleproductimages(productid):
 
     """
