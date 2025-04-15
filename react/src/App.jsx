@@ -26,6 +26,7 @@ function App() {
   const [clientSecret, setClientSecret] = useState(''); //Initiializing client secret
   const location = useLocation(); // Using this to change locations and force rerender from when we use Login.jsx
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // To prevent a race condition with logging in and logging out functionality
 
   // Will use this to get the client secret from the backend and pass to CheckoutComponent
   useEffect(() => {
@@ -38,6 +39,7 @@ function App() {
 
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
+    setIsLoggingOut(true); // Set logging out state to true
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
     setUser(null);
     console.log('From App.jsx - Logging out');
@@ -46,6 +48,9 @@ function App() {
 
   // Will use this to see if the user is logged in or not as well as pass in user details to other components
   useEffect(() => {
+    
+    if(isLoggingOut) return; // Prevent fetching user data if logging out
+
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
       if (response) {
@@ -60,6 +65,13 @@ function App() {
     getUser();
   }
   , [location]);
+  
+  // This will be used to check if the user is logged in or not
+  useEffect(() => {
+    if(user){
+      setIsLoggingOut(false); // Reset logging out state
+    }
+  }, [user]);
 
   console.log("From App.jsx - The userid we got back was ", user);
 
