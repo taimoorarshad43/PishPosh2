@@ -107,7 +107,7 @@ function App() {
           <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
           <Route path = "/upload/:userid/ai" element = {<AIUpload {...user} />}></Route>
           <Route path="/checkout" element={
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <Elements stripe={stripePromise} options={{ clientSecret }}> {/*Stripe Component*/}
               <CheckoutComponent/>
             </Elements>}/>
           <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>

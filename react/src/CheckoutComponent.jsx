@@ -9,7 +9,7 @@ const CheckoutComponent = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [products, setProducts] = useState([]);
 
-  const subtotal = 0; // Temp until we can get taht from backend
+  const subtotal = 0; // Temp until we can get that from backend
 
   // Get product data from cart endpoint and set products
   useEffect(() => {
