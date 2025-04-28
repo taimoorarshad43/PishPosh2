@@ -3,6 +3,17 @@ import base64
 from mistralai import Mistral
 import os
 
+# Retrieve the API key from environment variables
+api_key = os.environ["MISTRAL_API_KEY"]
+
+# Specify model
+model = "pixtral-12b-2409"
+
+# Initialize the Mistral client
+client = Mistral(api_key=api_key)
+
+# base64_image = getimages()
+
 def getimages():
     # Calling API for random image
     img_url = 'https://picsum.photos/200'
@@ -14,17 +25,6 @@ def getimages():
     img_data_encoded = base64.b64encode(img_data)
 
     return img_data_encoded
-
-base64_image = getimages()
-
-# Retrieve the API key from environment variables
-api_key = os.environ["MISTRAL_API_KEY"]
-
-# Specify model
-model = "pixtral-12b-2409"
-
-# Initialize the Mistral client
-client = Mistral(api_key=api_key)
 
 def encodeimage(img_data):
 
