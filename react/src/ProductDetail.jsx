@@ -92,6 +92,18 @@ const ProductDetail = () => {
           </Col>
         </Row>
       </Container>
+
+      {/*        */}
+
+      <Container>
+      <div className="text-center mt-5">
+        <h2>Product Suggestions</h2>
+        <p>Suggestions will be displayed here.</p>
+      </div>
+      </Container>
+  
+      {/*       */}
+
     </>
   );
 };
