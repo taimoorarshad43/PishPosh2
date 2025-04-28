@@ -1,4 +1,4 @@
-from flask import Blueprint, session, render_template, redirect, flash, request, jsonify, make_response
+from flask import Blueprint, session, render_template, redirect, flash, request, jsonify, make_response, current_app
 from flask_cors import cross_origin
 from models import User, db
 from forms import SignUpForm, ProductUploadForm
@@ -49,51 +49,8 @@ def userdetail():
 
         flash('Please login to view your profile', 'btn-info')
         return redirect('/')
-
-# @userroutes.route('/signup', methods = ['GET', 'POST'])
-# def signup():
-
-#     signinform = SignUpForm()
-
-#     if signinform.validate_on_submit(): # Handles our POST requests
-#         username = signinform.username.data
-#         password = signinform.password.data
-#         firstname = signinform.firstname.data
-#         lastname = signinform.lastname.data
-
-#         ####################### Validation of user input #################################
-#         if len(username) < 4:
-#             signinform.username.errors.append("Username must be at least 4 characters long")
-#             return render_template('signup.html', form = signinform)
-#         if len(password) <= 6:
-#             signinform.password.errors.append("Password must be at least 6 characters long")
-#             return render_template('signup.html', form = signinform)
-#         if len(firstname) == 0:
-#             signinform.firstname.errors.append("You need to add your first name")
-#             return render_template('signup.html', form = signinform)
-#         ##################################################################################
-
-#         user = User.hashpassword(username, password, firstname, lastname)
-
-#         db.session.add(user)
-#         try:                            # Handles the possibility that the username is already taken
-#             db.session.commit()
-#         except IntegrityError:
-#             signinform.username.errors.append("Username already taken")
-#             return render_template('signup.html', form = signinform) # Return to GET route of signin
-
-#         session['userid'] = user.id
-#         session['username'] = user.username
-#         session['userfirstname'] = user.firstname
-#         session['userlastname']= user.lastname
-
-#         flash("Sign Up Successful!", 'btn-success')
-
-#         return redirect('/')
-
-#     else:                              # Handles our GET requests
-#         return render_template('signup.html', form = signinform)
     
+ 
 @userroutes.route('/signup', methods = ['POST'])
 def signup():
 
@@ -200,7 +157,9 @@ def logout():
     print("From /logout route", session.get('userid', None))
 
     resp = make_response(jsonify("Logged out"))
-    resp.delete_cookie('userid')
+    cookie_name = current_app.config.get('SESSION_COOKIE_NAME', 'session')
+    resp.set_cookie(cookie_name, '', expires=0)
+    resp.headers['Cache-Control'] = 'no-store' # Doing this in an attempt to prevent race condition with logging in and logging out.
 
     return resp
     
