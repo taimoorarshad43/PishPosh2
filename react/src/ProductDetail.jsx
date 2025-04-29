@@ -7,6 +7,7 @@ const ProductDetail = () => {
   // Extract the product id from the URL
   const { productid } = useParams();
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   // Fetch product data when the component mounts or productid changes
   useEffect(() => {
@@ -27,6 +28,26 @@ const ProductDetail = () => {
 
     fetchProduct();
   }, [productid]);
+
+    // Fetch related products when the component mounts or productid changes
+    useEffect(() => {
+      const fetchRelatedProduct = async () => {
+        try {
+          const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/related`, {}, {withCredentials: true});
+          if (response) {
+            const data = await response.data;
+            console.log(data)
+            setRelatedProducts(data.RelatedProducts);
+          } else {
+            console.error('Failed to fetch product data');
+          }
+        } catch (error) {
+          console.error('Error fetching product data:', error);
+        }
+      };
+  
+      fetchRelatedProduct();
+    }, [productid]);
 
 
   // Handler to add product to the cart using a POST request.
@@ -95,11 +116,40 @@ const ProductDetail = () => {
 
       {/*        */}
 
-      <Container>
+      {/* <Container>
       <div className="text-center mt-5">
         <h2>Product Suggestions</h2>
         <p>Suggestions will be displayed here.</p>
       </div>
+      </Container> */}
+
+      <Container className="mt-5">
+        <div className="text-center mb-4">
+          <h2>Product Suggestions</h2>
+        </div>
+        <Row>
+          {Object.values(relatedProducts).map((p) => (
+            <Col key={p.id} md={3} className="d-flex flex-column align-items-center mb-4">
+              <Image
+                src={`data:image/jpeg;base64,${p.image}`}
+                alt={p.productname}
+                rounded
+                fluid
+                style={{ maxHeight: '150px', objectFit: 'cover' }}
+                className="mb-2"
+              />
+              <h6 className="text-center">{p.productname}</h6>
+              <Button
+                as={Link}
+                to={`/product/${p.id}`}
+                variant="outline-primary"
+                className="mt-auto"
+              >
+                View Product
+              </Button>
+            </Col>
+          ))}
+        </Row>
       </Container>
   
       {/*       */}

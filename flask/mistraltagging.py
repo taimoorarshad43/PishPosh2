@@ -82,10 +82,6 @@ def testing(sample = 1):
 def bulk_tag_all_products():
     """
     Walk through every Product in the database and attach tags.
-
-    :param tag_selector_fn: A callable that takes a Product instance and
-      returns an iterable of tag-name strings to attach.
-      E.g. `lambda product: ['electronics', 'sale']`
     """
     with app.app_context():
         # Fetch all products
