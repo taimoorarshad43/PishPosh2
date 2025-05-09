@@ -20,13 +20,15 @@ import PaymentConfirmation from './PaymentConfirmation';
 const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JEt228TH9Mw5vtM3yXryMfcnnOisTAt7rslzRbZDdBcPcxyIruU5400GeH1HxJH');
 // Loading stripe public key outside App component to avoid reinitializing it on every render
 
+/* Only use useEffect if theres a logout* */
+
 function App() {
 
   const [user, setUser] = useState(null);
   const [clientSecret, setClientSecret] = useState(''); //Initiializing client secret
   const location = useLocation(); // Using this to change locations and force rerender from when we use Login.jsx
   const navigate = useNavigate();
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // To prevent a race condition with logging in and logging out functionality
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // To prevent a race condition with logging in and logging out functionality DEPRECATE
 
   // Will use this to get the client secret from the backend and pass to CheckoutComponent
   useEffect(() => {
@@ -49,7 +51,7 @@ function App() {
   // Will use this to see if the user is logged in or not as well as pass in user details to other components
   useEffect(() => {
     
-    if(isLoggingOut) return; // Prevent fetching user data if logging out
+    if(isLoggingOut) return; // Prevent fetching user data if logging out // DEPRECATE
 
     const getUser = async () => {
       const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
@@ -74,6 +76,7 @@ function App() {
   }, [user]);
 
   console.log("From App.jsx - The userid we got back was ", user);
+  console.log("From App.jsx - The location was ", location);
 
   return (
     <div className = "App">
