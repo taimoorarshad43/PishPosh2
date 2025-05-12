@@ -119,20 +119,19 @@ function App() {
               <CheckoutComponent/>
             </Elements>}/>
           <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>
-          
-          {/*Toast Service Component*/}
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
         </Routes>
+        {/*Toast Service Component*/}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       {/* </BrowserRouter> */}
     </div>
   )
