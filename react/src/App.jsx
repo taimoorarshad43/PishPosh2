@@ -49,7 +49,7 @@ function App() {
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
     setUser(null);
     toastService.info("Logged out!")
-    console.log('From App.jsx - Logging out');
+    // console.log('From App.jsx - Logging out');
     navigate('/', {replace: true});
   }
 
@@ -63,7 +63,7 @@ function App() {
       if (response) {
           // Response will either be a userid or not authorized
           const data = await response.data.user;
-          console.log("From App useEffect() - the data is", data);
+          // console.log("From App useEffect() - the data is", data);
           setUser(data);
       }else{
           console.error('Error fetching user data');
@@ -80,8 +80,8 @@ function App() {
     }
   }, [user]);
 
-  console.log("From App.jsx - The userid we got back was ", user);
-  console.log("From App.jsx - The location was ", location);
+  // console.log("From App.jsx - The userid we got back was ", user);
+  // console.log("From App.jsx - The location was ", location);
 
   return (
     <div className = "App">
@@ -125,7 +125,7 @@ function App() {
         {/*Toast Service Component*/}
         <ToastContainer
           position="top-right"
-          autoClose={5000}
+          autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
