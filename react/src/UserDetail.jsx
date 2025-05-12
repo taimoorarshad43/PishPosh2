@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import toastService from './services/toastservice';
+
 const UserDetail = (props) => {
 
   console.log("From UserDetail.jsx - The props we got back were ", props);
@@ -80,15 +82,18 @@ const UserDetail = (props) => {
       });
   };
 
+  // Handle product deletion
   const handleDelete = (productId) => {
     axios
       .delete(`http://127.0.0.1:5000/product/${productId}/delete`, null, {withCredentials: true})
       .then(response => {
         console.log("From UserDetail.jsx - The response we got back was ", response);
         setProducts(products.filter(product => product.productid !== productId));           // Deleting product from state
+        toastService[response.data.status](response.data.message);
       })
       .catch(err => {
         console.error('Error deleting product:', err);
+        toastService.error("Error deleting product");
       });
   }
 
