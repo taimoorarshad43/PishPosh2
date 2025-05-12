@@ -6,6 +6,9 @@ import axios from 'axios'
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import IndexPage from './Index'
 import Signup from './Signup'
 import Login from './Login'
@@ -109,11 +112,26 @@ function App() {
           <Route path = "/user/:userid" element = {<User/>}></Route>
           <Route path = "/userdetail" element = {<UserDetail {...user} />}></Route>
           <Route path = "/upload/:userid/ai" element = {<AIUpload {...user} />}></Route>
+
+          {/*Stripe Component*/}
           <Route path="/checkout" element={
-            <Elements stripe={stripePromise} options={{ clientSecret }}> {/*Stripe Component*/}
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutComponent/>
             </Elements>}/>
           <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>
+          
+          {/*Toast Service Component*/}
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
         </Routes>
       {/* </BrowserRouter> */}
     </div>
