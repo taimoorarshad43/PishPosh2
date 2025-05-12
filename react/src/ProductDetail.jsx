@@ -31,25 +31,25 @@ const ProductDetail = () => {
     fetchProduct();
   }, [productid]);
 
-    // Fetch related products when the component mounts or productid changes
-    useEffect(() => {
-      const fetchRelatedProduct = async () => {
-        try {
-          const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/related`, {}, {withCredentials: true});
-          if (response) {
-            const data = await response.data;
-            console.log(data)
-            setRelatedProducts(data.RelatedProducts);
-          } else {
-            console.error('Failed to fetch product data');
-          }
-        } catch (error) {
-          console.error('Error fetching product data:', error);
+  // Fetch related products when the component mounts or productid changes
+  useEffect(() => {
+    const fetchRelatedProduct = async () => {
+      try {
+        const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/related`, {}, {withCredentials: true});
+        if (response) {
+          const data = await response.data;
+          console.log(data)
+          setRelatedProducts(data.RelatedProducts);
+        } else {
+          console.error('Failed to fetch product data');
         }
-      };
-  
-      fetchRelatedProduct();
-    }, [productid]);
+      } catch (error) {
+        console.error('Error fetching product data:', error);
+      }
+    };
+
+    fetchRelatedProduct();
+  }, [productid]);
 
 
   // Handler to add product to the cart using a POST request.
