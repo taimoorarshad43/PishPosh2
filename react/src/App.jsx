@@ -8,6 +8,7 @@ import { Elements } from '@stripe/react-stripe-js';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import toastService from './services/toastservice';
 
 import IndexPage from './Index'
 import Signup from './Signup'
@@ -47,6 +48,7 @@ function App() {
     setIsLoggingOut(true); // Set logging out state to true
     await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
     setUser(null);
+    toastService.info("Logged out!")
     console.log('From App.jsx - Logging out');
     navigate('/', {replace: true});
   }
