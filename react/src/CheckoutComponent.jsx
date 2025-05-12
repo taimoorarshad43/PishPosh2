@@ -1,6 +1,8 @@
 // CheckoutComponent.js
 import React, { useState, useEffect } from 'react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
+import { Container, Row, Col, Badge, Button, Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const CheckoutComponent = () => {
@@ -9,14 +11,12 @@ const CheckoutComponent = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [products, setProducts] = useState([]);
 
-  const subtotal = 0; // Temp until we can get that from backend
-
   // Get product data from cart endpoint and set products
   useEffect(() => {
     const getProducts = async () => {
       const response = await axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
       const data = await response.data;
-      console.log("From Cart.jsx - the data is", data);
+      console.log("From CheckoutComponent.jsx - the data is", data);
         if(data){
           setProducts(data);
         }else{
@@ -56,23 +56,48 @@ const CheckoutComponent = () => {
     <div className="container">
       <div className="mt-5 row text-center">
         <div className="col-8">
-      {products &&
-            Object.values(products).map((product) => (
-              <div className="mt-5" key={product.productid}>
-                {product.image && (
-                  <img
-                    src={`data:image/jpeg;base64,${product.image}`}
-                    alt={product.productname}
-                  />
-                )}
-                <br />
-                <a href={`/product/${product.productid}`}>{product.productname}</a>
-                <span className="badge ml-3">Price: ${product.price}.00</span>
-              </div>
-            ))}
-          {subtotal && (
-            <p className="badge badge-pill badge-primary mt-5">Subtotal: ${subtotal}.00</p>
-          )}
+      {products && Object.keys(products).length > 1 ? ( // products object from backend will always at least have a subtotal key
+        <>
+          <Row className="text-center">
+            <Col md={8}>
+              {Object.values(products).map(product => ( // loop through the product dictionary's values and go from there
+                <div key={product.productid} className="mt-5">
+                  {product.image && (
+                    <>
+                      <Image
+                        src={`data:image/jpeg;base64,${product.image}`}
+                        alt={product.productname}
+                        fluid
+                      />
+                      <br />
+                      <Link to={`/product/${product.productid}`}>
+                        {product.productname}
+                      </Link>
+                      <span className="ml-3">
+                        <Badge variant="primary">
+                          Price: ${product.price}.00
+                        </Badge>
+                      </span>
+                    </>
+                  )}
+                </div>
+              ))}
+              <Badge pill variant="primary">
+                Subtotal: ${products.cart_subtotal}.00
+              </Badge>
+            </Col>
+          </Row>
+          <Row className="text-center">
+            <Col className="mt-5">
+              <Button variant="info" as={Link} to="/checkout">
+                Checkout
+              </Button>
+            </Col>
+          </Row>
+        </>
+      ) : (                                                           // If nothing in cart, then we have this message
+        <h4 className="display-4 text-center">Nothing in Cart</h4>
+      )}
         </div>
         <div className="col-4">
           <form id="payment-form" onSubmit={handleSubmit}>
