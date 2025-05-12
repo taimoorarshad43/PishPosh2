@@ -83,7 +83,6 @@ function App() {
 
   return (
     <div className = "App">
-      {/* <BrowserRouter> */}
         <Navbar bg="primary" variant="light" className="justify-content-between">
           <Container>
             <Navbar.Brand as={Link} to="/" className = "text-light">PishPosh</Navbar.Brand>
@@ -119,6 +118,7 @@ function App() {
               <CheckoutComponent/>
             </Elements>}/>
           <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>
+
         </Routes>
         {/*Toast Service Component*/}
         <ToastContainer
@@ -132,7 +132,6 @@ function App() {
           draggable
           pauseOnHover
         />
-      {/* </BrowserRouter> */}
     </div>
   )
 }
