@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toastService from './services/toastservice';
 
 const Login = () => {
   // Define state for form fields and any validation errors.
@@ -45,6 +46,7 @@ const Login = () => {
       if(response.data !== "null"){
         // Redirect to the homepage after login if user is authenticated.
         console.log(`From Login.jsx - Logging in with ${response.data}`);
+        toastService.info("Logged In!")
         navigate('/', {replace: true});
       }else{
         // Handle any errors here, such as displaying a notification to the user.
