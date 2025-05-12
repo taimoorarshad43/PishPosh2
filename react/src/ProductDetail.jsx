@@ -123,6 +123,8 @@ const ProductDetail = () => {
       </div>
       </Container> */}
 
+      {/* Product Suggestions Section */}
+
       <Container className="mt-5">
         <div className="text-center mb-4">
           <h2>Product Suggestions</h2>
@@ -141,7 +143,7 @@ const ProductDetail = () => {
               <h6 className="text-center">{p.productname}</h6>
               <Button
                 as={Link}
-                to={`/product/${p.id}`}
+                to={`/product/${p.productid}`}
                 variant="outline-primary"
                 className="mt-auto"
               >
