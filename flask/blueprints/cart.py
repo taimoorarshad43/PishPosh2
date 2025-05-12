@@ -20,7 +20,7 @@ def cart():
 
     # If we don't have a userid, then they're not logged in and can't view this route.
     if not userid:
-        productid = session['lastviewedproduct']
+        productid = session.get('lastviewedproduct', None)
         return jsonify({'status': 'error', 'message': 'Please log in to view your cart'}), 401
 
 
