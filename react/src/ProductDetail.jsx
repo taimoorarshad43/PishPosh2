@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Image, Button } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 
+import toastService from './services/toastservice';
+
 const ProductDetail = () => {
   // Extract the product id from the URL
   const { productid } = useParams();
@@ -54,24 +56,28 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/addtocart`, {}, {withCredentials: true});
     console.log(response);
-    if (response) {
+    if (response.data.status === 'success') {
+      // We'll console.log as well as show a toast message based on the message we receive from the backend
       console.log('Product added to cart');
-      // Optionally update state or notify the user
+      toastService[response.data.status](response.data.message);
     } else {
       console.error('Failed to add product to cart');
+      toastService.error(response.data.message);
     }
   };
 
   // Handler to remove product from the cart using a POST request.
   const handleRemoveFromCart = async () => {
-      const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/removefromcart`, {}, {withCredentials: true});
-      console.log(response);
-      if (response) {
-        console.log('Product removed from cart');
-        // Optionally update state or notify the user
-      } else {
-        console.error('Failed to remove product from cart');
-      }
+    const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/removefromcart`, {}, {withCredentials: true});
+    console.log(response);
+    if (response.data.status === 'success') {
+      // We'll console.log as well as show a toast message based on the message we receive from the backend
+      console.log('Product removed to cart');
+      toastService[response.data.status](response.data.message);
+    } else {
+      console.error('Failed to remove product to cart');
+      toastService.error(response.data.message);
+    }
 
   };
 
