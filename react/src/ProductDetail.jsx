@@ -54,29 +54,39 @@ const ProductDetail = () => {
 
   // Handler to add product to the cart using a POST request.
   const handleAddToCart = async () => {
-    const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/addtocart`, {}, {withCredentials: true});
-    console.log(response);
-    if (response.data.status === 'success') {
-      // We'll console.log as well as show a toast message based on the message we receive from the backend
-      console.log('Product added to cart');
-      toastService[response.data.status](response.data.message);
-    } else {
-      console.error('Failed to add product to cart');
-      toastService.error(response.data.message);
+    try{
+      const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/addtocart`, {}, {withCredentials: true});
+      console.log(response);
+      if (response.data.status === 'success') {
+        // We'll console.log as well as show a toast message based on the message we receive from the backend
+        console.log('Product added to cart');
+        toastService[response.data.status](response.data.message);
+      } else {
+        console.log('Failed to add product to cart');
+        toastService.error("Failed to add product to cart");
+      }
+    }catch{
+      console.log('Catch Block, failed to add product to cart')
+      toastService.error("Failed to add product to cart - Please Login")
     }
   };
 
   // Handler to remove product from the cart using a POST request.
   const handleRemoveFromCart = async () => {
-    const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/removefromcart`, {}, {withCredentials: true});
-    console.log(response);
-    if (response.data.status === 'success') {
-      // We'll console.log as well as show a toast message based on the message we receive from the backend
-      console.log('Product removed to cart');
-      toastService[response.data.status](response.data.message);
-    } else {
-      console.error('Failed to remove product to cart');
-      toastService.error(response.data.message);
+    try{
+      const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/removefromcart`, {}, {withCredentials: true});
+      console.log(response);
+      if (response.data.status === 'success') {
+        // We'll console.log as well as show a toast message based on the message we receive from the backend
+        console.log('Product removed to cart');
+        toastService[response.data.status](response.data.message);
+      } else {
+        console.error('Failed to remove product to cart');
+        toastService.error("Failed to remove product from cart");
+      }
+    }catch{
+      console.log('Catch Block, failed to remove product from cart')
+      toastService.error("Failed to remove product from cart - Please Login")
     }
 
   };
