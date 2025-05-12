@@ -42,10 +42,17 @@ def getrelatedproducts(productid):
 @productroutes.route('/product/<int:productid>/delete', methods = ['DELETE'])
 def deleteproduct(productid):
 
-    Product.query.filter_by(productid=productid).delete()
-    db.session.commit()
+    product = Product.query.get(productid)
 
-    return jsonify({'success': True, 'message': 'Product deleted successfully.'}), 200
+    try:
+        db.session.delete(product)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print("Error deleting product:", e)
+        return jsonify({'status': 'error', 'message': 'Failed to delete product.'}), 500
+
+    return jsonify({'status': 'success', 'message': 'Product deleted successfully.'}), 200
 
 
 def serialize(object, params): # Helper function for serializing different SQLA objects

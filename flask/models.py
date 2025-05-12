@@ -145,9 +145,11 @@ class ProductTag(db.Model):
     __tablename__ = 'products_tags'
 
     tagid = db.Column(db.Integer,
-                      db.ForeignKey('tags.tagid'),
+                      db.ForeignKey('tags.tagid',
+                        ondelete = 'cascade'),
                          primary_key = True)
 
     productid = db.Column(db.Integer,
-                          db.ForeignKey('products.productid'),
+                          db.ForeignKey('products.productid',
+                        ondelete = 'cascade'),
                           primary_key = True)
