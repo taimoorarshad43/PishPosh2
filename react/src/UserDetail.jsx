@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-import toastService from './services/toastservice';
+import { toast } from 'react-toastify';
 
 const UserDetail = (props) => {
 
@@ -18,6 +19,21 @@ const UserDetail = (props) => {
   const [errors, setErrors] = useState({});
   const userId = props.id;
   const user = props;                                 // Will be passing user object from App.jsx
+  const username = props.username;
+  const toastId = React.useRef(null);
+  const navigate = useNavigate();
+  
+  
+    // If we're not logged in, then we don't have a username and we need to be redirected to index
+    // Send a Toast message saying we're not logged in
+    useEffect(() =>{
+      if(!username){
+        navigate('/', {replace : true});
+        if(! toast.isActive(toastId.current)) {     // Doing this to prevent duplicate Toast messages
+          toastId.current = toast.info("Please Log In to view your profile");
+        }
+      }
+    })
 
   // Fetch user products when the component mounts.
   useEffect(() => {
