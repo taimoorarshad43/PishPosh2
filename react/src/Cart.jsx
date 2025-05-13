@@ -1,13 +1,29 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Badge, Button, Image } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 const Cart = (props) => {
 
   const username = props.username;
   const firstname = props.firstname;
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
+  const toastId = React.useRef(null);
+
+
+  // If we're not logged in, then we don't have a username and we need to be redirected to index
+  // Send a Toast message saying we're not logged in
+  useEffect(() =>{
+    if(!username){
+      navigate('/', {replace : true});
+      if(! toast.isActive(toastId.current)) {     // Doing this to prevent duplicate Toast messages
+        toastId.current = toast.info("Please Log In to view your cart");
+      }
+    }
+  })
 
   // Get product data from cart endpoint and set products
   useEffect(() => {
