@@ -41,7 +41,7 @@ function App() {
         setClientSecret(response.data);
         // console.log("From App.jsx - The client secret we got back was ", response.data);
       });
-  }, [location]);
+  }, []);
 
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
