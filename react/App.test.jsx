@@ -28,8 +28,11 @@ test('Product Detail renders without crashing', () => {
 })
 
 test('UserDetail renders without crashing', () =>{
-    render(<UserDetail/>);
-})
+  render(
+    // <BrowserRouter>
+      <UserDetail />
+    // </BrowserRouter>
+  );})
 
 test('Login renders without crashing', () =>{
   render(
@@ -48,7 +51,9 @@ test('Signup renders without crashing', () =>{
 
 test('Cart renders without crashing', () =>{
   render(
+    // <BrowserRouter>
       <Cart />
-  );
+    // </BrowserRouter>  
+    );
 })
 
