@@ -22,7 +22,7 @@ const UserDetail = (props) => {
   const username = props.username;
   const toastId = React.useRef(null);
   const navigate = useNavigate();
-  
+  const BASE_URL = 'http://127.0.0.1:5000';
   
     // If we're not logged in, then we don't have a username and we need to be redirected to index
     // Send a Toast message saying we're not logged in
@@ -39,7 +39,7 @@ const UserDetail = (props) => {
   useEffect(() => {
     const getProducts = async () => {
       if (userId){
-        const response = await axios.get(`http://localhost:5000/v1/users/${userId}/products`);
+        const response = await axios.get(`${BASE_URL}/v1/users/${userId}/products`);
         if(response){
             // Set products with response data.
             const data = await response.data.User.products;
@@ -76,11 +76,11 @@ const UserDetail = (props) => {
       data.append('productImage', formData.productImage);
     }
     axios
-      .post(`http://127.0.0.1:5000/upload/${userId}`, data, {withCredentials: true})
+      .post(`${BASE_URL}/upload/${userId}`, data, {withCredentials: true})
       .then(response => {
         // Refresh the product list after successful upload or update error fields if we got any.
         console.log("From UserDetail.jsx - The response we got back was ", response);
-        return axios.get(`http://localhost:5000/v1/users/${userId}/products`);
+        return axios.get(`${BASE_URL}/v1/users/${userId}/products`);
       })
       .then(res => {
         setProducts(res.data.products);
@@ -101,7 +101,7 @@ const UserDetail = (props) => {
   // Handle product deletion
   const handleDelete = (productId) => {
     axios
-      .delete(`http://127.0.0.1:5000/product/${productId}/delete`, null, {withCredentials: true})
+      .delete(`${BASE_URL}/product/${productId}/delete`, null, {withCredentials: true})
       .then(response => {
         console.log("From UserDetail.jsx - The response we got back was ", response);
         setProducts(products.filter(product => product.productid !== productId));           // Deleting product from state
