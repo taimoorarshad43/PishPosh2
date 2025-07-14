@@ -13,6 +13,7 @@ const Signup = () => {
   });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const BASE_URL = 'http://127.0.0.1:5000';
 
   // Generic onChange handler for controlled components.
   const handleChange = (e) => {
@@ -41,7 +42,7 @@ const Signup = () => {
       return;
     }
 
-    axios.post('http://localhost:5000/signup', formData).then((response) => {
+    axios.post(`${BASE_URL}/signup`, formData, {withCredentials: true}).then((response) => {
       console.log(response.data);
       if(response.data){
         // Redirect to the homepage after login if user is authenticated.

@@ -48,7 +48,7 @@ const Login = () => {
         // After login, fetch user info to ensure session is set
         axios.get(`${BASE_URL}/@me`, {withCredentials:true})
           .then(userRes => {
-            if (userRes.data && userRes.data.user) {
+            if (userRes.data && userRes.data.user && userRes.data.user !== "null") {
               toastService.info("Logged In!");
               navigate('/', {replace: true});
             } else {
