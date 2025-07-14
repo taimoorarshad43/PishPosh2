@@ -24,6 +24,8 @@ import PaymentConfirmation from './PaymentConfirmation';
 const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JEt228TH9Mw5vtM3yXryMfcnnOisTAt7rslzRbZDdBcPcxyIruU5400GeH1HxJH');
 // Loading stripe public key outside App component to avoid reinitializing it on every render
 
+const BASE_URL = 'http://127.0.0.1:5000';
+
 /* Only use useEffect if theres a logout* */
 
 function App() {
@@ -36,7 +38,7 @@ function App() {
 
   // Will use this to get the client secret from the backend and pass to CheckoutComponent
   useEffect(() => {
-    axios.post('http://127.0.0.1:5000/stripe_key', {}, {withCredentials: true})
+    axios.post(`${BASE_URL}/stripe_key`, {}, {withCredentials: true})
       .then(response => {
         setClientSecret(response.data);
         // console.log("From App.jsx - The client secret we got back was ", response.data);
@@ -46,7 +48,7 @@ function App() {
   // Will use this to logout the user - no need for a dedicated component
   const logout = async () => {
     setIsLoggingOut(true); // Set logging out state to true
-    await axios.post(`http://127.0.0.1:5000/logout`, {}, {withCredentials: true});
+    await axios.post(`${BASE_URL}/logout`, {}, {withCredentials: true});
     setUser(null);
     toastService.info("Logged out!")
     // console.log('From App.jsx - Logging out');
@@ -59,7 +61,7 @@ function App() {
     if(isLoggingOut) return; // Prevent fetching user data if logging out // DEPRECATE
 
     const getUser = async () => {
-      const response = await axios.get(`http://127.0.0.1:5000/@me`, {withCredentials: true});
+      const response = await axios.get(`${BASE_URL}/@me`, {withCredentials: true});
       if (response) {
           // Response will either be a userid or not authorized
           const data = await response.data.user;

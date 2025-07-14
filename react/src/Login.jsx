@@ -13,6 +13,7 @@ const Login = () => {
   // Set error fields.
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const BASE_URL = 'http://127.0.0.1:5000';
 
   // Update state on input change.
   const handleChange = (e) => {
@@ -41,18 +42,26 @@ const Login = () => {
     }
 
     // Submit form data to API using axios.
-    axios.post('http://127.0.0.1:5000/login', formData, {withCredentials:true})
+    axios.post(`${BASE_URL}/login`, formData, {withCredentials:true})
     .then((response) => {
       if(response.data !== "null"){
-        // Redirect to the homepage after login if user is authenticated.
-        console.log(`From Login.jsx - Logging in with ${response.data}`);
-        toastService.info("Logged In!")
-        navigate('/', {replace: true});
+        // After login, fetch user info to ensure session is set
+        axios.get(`${BASE_URL}/@me`, {withCredentials:true})
+          .then(userRes => {
+            if (userRes.data && userRes.data.user) {
+              toastService.info("Logged In!");
+              navigate('/', {replace: true});
+            } else {
+              setErrors({username: 'Login failed, please try again.'});
+            }
+          })
+          .catch(() => {
+            setErrors({username: 'Login failed, please try again.'});
+          });
       }else{
         // Handle any errors here, such as displaying a notification to the user.
         setErrors({username: 'Invalid Username or Password', password: 'Invalid Username or Password'});
       }
-
     }
     ).catch((error) => {
       console.error('Error:', error);
