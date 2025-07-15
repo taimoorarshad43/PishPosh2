@@ -3,6 +3,7 @@ import { Form, Button, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toastService from './services/toastservice';
+import { useUser } from "./services/UserContext";
 
 const Login = () => {
   // Define state for form fields and any validation errors.
@@ -14,6 +15,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const BASE_URL = 'http://127.0.0.1:5000';
+  const { login } = useUser();
 
   // Update state on input change.
   const handleChange = (e) => {
@@ -25,7 +27,7 @@ const Login = () => {
   };
 
   // Handle form submission.
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Clear previous errors.
     setErrors({});
@@ -41,20 +43,16 @@ const Login = () => {
       return;
     }
 
-    // Submit form data to API using axios.
-    axios.post(`${BASE_URL}/login`, formData, {withCredentials:true})
-    .then((response) => {
-      if(response.data !== "null"){
-        toastService.info("Logged In!");
-        navigate('/', {replace: true}); // Restore SPA navigation
-      }else{
-        setErrors({username: 'Invalid Username or Password', password: 'Invalid Username or Password'});
-      }
+    const success = await login(formData);
+    if (success) {
+      toastService.info("Logged In!");
+      navigate('/', { replace: true });
+    } else {
+      setErrors({
+        username: 'Invalid Username or Password',
+        password: 'Invalid Username or Password',
+      });
     }
-    ).catch((error) => {
-      console.error('Error:', error);
-      // Handle any errors here, such as displaying a notification to the user.
-    });
 
   };
 
