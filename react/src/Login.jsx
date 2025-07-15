@@ -45,21 +45,9 @@ const Login = () => {
     axios.post(`${BASE_URL}/login`, formData, {withCredentials:true})
     .then((response) => {
       if(response.data !== "null"){
-        // After login, fetch user info to ensure session is set
-        axios.get(`${BASE_URL}/@me`, {withCredentials:true})
-          .then(userRes => {
-            if (userRes.data && userRes.data.user && userRes.data.user !== "null") {
-              toastService.info("Logged In!");
-              navigate('/', {replace: true});
-            } else {
-              setErrors({username: 'Login failed, please try again.'});
-            }
-          })
-          .catch(() => {
-            setErrors({username: 'Login failed, please try again.'});
-          });
+        toastService.info("Logged In!");
+        navigate('/', {replace: true}); // Restore SPA navigation
       }else{
-        // Handle any errors here, such as displaying a notification to the user.
         setErrors({username: 'Invalid Username or Password', password: 'Invalid Username or Password'});
       }
     }

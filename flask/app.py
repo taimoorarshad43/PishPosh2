@@ -66,6 +66,6 @@ toolbar = DebugToolbarExtension(app)
 ########### Test Session for Server Side Cookies/Redis ###########
 
 server_session = Session(app)
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173"])             # Enable CORS for the app for all routes
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173", "http://localhost:5173"])             # Enable CORS for the app for all routes
 
 ####################################################################
