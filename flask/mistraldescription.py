@@ -33,10 +33,13 @@ def encodeimage(img_data):
     """
 
     img_data= base64.b64encode(img_data.read())
+    # print("From encodeimage() - encoded img_data is: ", img_data)
 
     return img_data
 
 def decodeimage(img_data):
+
+    # print("From decodeimage() - decoded img_data is: ", img_data.decode('utf-8'))
 
     return img_data.decode('utf-8')
 
