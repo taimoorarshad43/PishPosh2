@@ -43,13 +43,12 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 ########### Test Session for Server Side Cookies/Redis ###########
 
-app.config['SESSION_TYPE'] = 'filesystem' # Or could be set to 'redis'
-# app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_COOKIE_PATH'] = '/' # Setting this to have different blueprints persist session correctly.
-# app.config['SESSION_USE_SIGNER'] = True
-# app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
-# app.config['SESSION_COOKIE_SECURE'] = True # uses https or not
-# app.config['SESSION_COOKIE_SAMESITE'] = 'None' # cookie will be sent to another origin(client)
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_COOKIE_PATH'] = '/'
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to False for HTTP development
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Use 'Lax' for development, 'None' for production
+app.config['SESSION_COOKIE_HTTPONLY'] = False  # Allow JavaScript access if needed
 
 ####################################################################
 
