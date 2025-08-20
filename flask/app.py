@@ -5,18 +5,8 @@ from flask_cors import CORS, cross_origin
 from flask_debugtoolbar import DebugToolbarExtension
 from dotenv import load_dotenv
 import redis
-from flask_session import Session
 
 from models import connect_db
-
-# Blueprint dependencies
-from blueprints.apiroutes import apiroutes
-from blueprints.checkout import productcheckout
-from blueprints.cart import cartroutes
-from blueprints.product import productroutes
-from blueprints.userroutes import userroutes
-from blueprints.uploadroutes import uploadroutes
-from blueprints.indexroutes import indexroutes
 
 load_dotenv()                               # Load environmental variables
 
@@ -41,18 +31,41 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "seekrat"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-########### Test Session for Server Side Cookies/Redis ###########
+########### Use Flask-Session with Redis ###########
 
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SESSION_PERMANENT'] = False
+# Redis session configuration
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
 app.config['SESSION_COOKIE_PATH'] = '/'
-app.config['SESSION_COOKIE_SECURE'] = False  # Set to False for HTTP development
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Use 'Lax' for development, 'None' for production
-app.config['SESSION_COOKIE_HTTPONLY'] = False  # Allow JavaScript access if needed
+app.config['SESSION_COOKIE_SECURE'] = True # This fixed race condition issue.
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_HTTPONLY'] = False
+app.config['SESSION_PERMANENT'] = False
+
+# ADD THESE MISSING CONFIGURATIONS:
+app.config['SESSION_KEY_PREFIX'] = 'session:'  # How Redis keys are prefixed
+app.config['SESSION_USE_SIGNER'] = True        # Sign session cookies for security
+app.config['SESSION_COOKIE_NAME'] = 'session'  # Explicitly set cookie name
+app.config['SESSION_COOKIE_DOMAIN'] = None     # Allow cross-subdomain cookies
+app.config['SESSION_COOKIE_MAX_AGE'] = 3600    # 1 hour session lifetime
+
+# Initialize Flask-Session
+from flask_session import Session
+server_session = Session(app)
 
 ####################################################################
 
-app.register_blueprint(apiroutes, url_prefix = "/v1")       # Registering blueprints
+# Import blueprints AFTER app and session are created
+from blueprints.apiroutes import apiroutes
+from blueprints.checkout import productcheckout
+from blueprints.cart import cartroutes
+from blueprints.product import productroutes
+from blueprints.userroutes import userroutes
+from blueprints.uploadroutes import uploadroutes
+from blueprints.indexroutes import indexroutes
+
+# Now register blueprints AFTER session is initialized
+app.register_blueprint(apiroutes, url_prefix = "/v1")
 app.register_blueprint(productcheckout)
 app.register_blueprint(cartroutes)
 app.register_blueprint(productroutes)
@@ -62,9 +75,16 @@ app.register_blueprint(indexroutes)
 
 toolbar = DebugToolbarExtension(app)
 
-########### Test Session for Server Side Cookies/Redis ###########
+########### CORS Configuration ###########
 
-server_session = Session(app)
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5173", "http://localhost:5173"])             # Enable CORS for the app for all routes
+# More permissive CORS for development
+CORS(app, 
+     supports_credentials=True, 
+     origins=["http://127.0.0.1:5173", "http://localhost:5173"],
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     expose_headers=["Set-Cookie"],
+     credentials=True
+)
 
 ####################################################################
