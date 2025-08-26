@@ -83,7 +83,7 @@ const UserDetail = (props) => {
         return axios.get(`${BASE_URL}/v1/users/${userId}/products`);
       })
       .then(res => {
-        setProducts(res.data.products);
+        setProducts(res.data.User.products);
         // Clear form fields after successful submission
         setFormData({
           productName: '',
@@ -121,7 +121,7 @@ const UserDetail = (props) => {
           {/* Left column: User's products */}
           <div className="col-6">
             <h2 className="mb-5">{user.firstname} {user.lastname}'s Products</h2>
-            {products.map(product => (
+            {Object.values(products).map(product => (
               <div key={product.productid} className="mb-5">
                 {product.image && (
                   <>
