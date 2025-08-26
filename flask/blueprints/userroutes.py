@@ -131,7 +131,7 @@ def login():
         session.modified = True
         user = user.username
         
-        # Enhanced debugging to see what's happening
+        # Enhanced debugging
         print(f"Session after setting: {dict(session)}")
         print(f"Session ID cookie: {request.cookies.get('session')}")
         print(f"All cookies: {dict(request.cookies)}")

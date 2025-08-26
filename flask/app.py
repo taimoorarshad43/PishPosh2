@@ -31,10 +31,10 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "seekrat"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-########### Use Flask-Session with Redis ###########
+########### Flask-Session with Redis ###########
 
 # Redis session configuration
-app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_TYPE'] = 'redis' # filesystem, memcached, redis, etc.
 app.config['SESSION_REDIS'] = redis.from_url("redis://localhost:6379")
 app.config['SESSION_COOKIE_PATH'] = '/'
 app.config['SESSION_COOKIE_SECURE'] = True # This fixed race condition issue.
@@ -42,7 +42,6 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 app.config['SESSION_PERMANENT'] = False
 
-# ADD THESE MISSING CONFIGURATIONS:
 app.config['SESSION_KEY_PREFIX'] = 'session:'  # How Redis keys are prefixed
 app.config['SESSION_USE_SIGNER'] = True        # Sign session cookies for security
 app.config['SESSION_COOKIE_NAME'] = 'session'  # Explicitly set cookie name
@@ -64,7 +63,7 @@ from blueprints.userroutes import userroutes
 from blueprints.uploadroutes import uploadroutes
 from blueprints.indexroutes import indexroutes
 
-# Now register blueprints AFTER session is initialized
+# Register blueprints AFTER session is initialized
 app.register_blueprint(apiroutes, url_prefix = "/v1")
 app.register_blueprint(productcheckout)
 app.register_blueprint(cartroutes)
@@ -77,7 +76,6 @@ toolbar = DebugToolbarExtension(app)
 
 ########### CORS Configuration ###########
 
-# More permissive CORS for development
 CORS(app, 
      supports_credentials=True, 
      origins=["http://127.0.0.1:5173", "http://localhost:5173"],
