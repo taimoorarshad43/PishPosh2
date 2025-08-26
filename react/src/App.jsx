@@ -20,6 +20,7 @@ import User from './User'
 import AIUpload from './AIUpload'
 import CheckoutComponent from './CheckoutComponent';
 import PaymentConfirmation from './PaymentConfirmation';
+import NotFound from './NotFound';
 import { useUser } from "./services/UserContext";
 
 const stripePromise = loadStripe('pk_test_51QIZ5VGS3ixkvINIJUDHhSJtcl3I5rpMFX4JEt228TH9Mw5vtM3yXryMfcnnOisTAt7rslzRbZDdBcPcxyIruU5400GeH1HxJH');
@@ -102,6 +103,9 @@ function App() {
               <CheckoutComponent/>
             </Elements>}/>
           <Route path = "/confirmation" element = {<PaymentConfirmation/>}></Route>
+
+          {/* 404 Route at end with catch all path */}
+          <Route path="*" element={<NotFound />} />
 
         </Routes>
         {/*Toast Service Component*/}
