@@ -9,6 +9,8 @@ const UserDetail = (props) => {
   console.log("From UserDetail.jsx - The props we got back were ", props);
 
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   // Form state for new product listing
   const [formData, setFormData] = useState({
     productName: '',
@@ -39,17 +41,40 @@ const UserDetail = (props) => {
   useEffect(() => {
     const getProducts = async () => {
       if (userId){
-        const response = await axios.get(`${BASE_URL}/v1/users/${userId}/products`);
-        if(response){
-            // Set products with response data.
-            const data = await response.data.User.products;
-            console.log(data);
-            setProducts(data);
-        }else{
-            console.error('Error fetching user data');
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const response = await axios.get(`${BASE_URL}/v1/users/${userId}/products`);
+          if(response && response.data.User && response.data.User.products){
+              // Set products with response data.
+              const data = response.data.User.products;
+              console.log(data);
+              setProducts(data);
+          } else {
+              console.error('Error fetching user data: Invalid response format');
+              setError('Invalid response format from server');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          
+          if (error.response?.status === 404) {
+            setError('User profile not found. Please check your login status.');
+          } else if (error.response?.status >= 500) {
+            setError('Server error occurred. Please try again later.');
+          } else if (error.response?.status >= 400) {
+            setError('Bad request. Please check your login status.');
+          } else if (error.code === 'NETWORK_ERROR') {
+            setError('Network error. Please check your connection.');
+          } else {
+            setError('An unexpected error occurred. Please try again.');
+          }
+        } finally {
+          setLoading(false);
         }
-      }else{
+      } else {
         console.log("From UserDetail.jsx - Waiting on userId");
+        setLoading(false);
       }
     }
     getProducts();
@@ -83,7 +108,11 @@ const UserDetail = (props) => {
         return axios.get(`${BASE_URL}/v1/users/${userId}/products`);
       })
       .then(res => {
-        setProducts(res.data.User.products);
+        if (res.data.User && res.data.User.products) {
+          setProducts(res.data.User.products);
+        } else {
+          setProducts([]);
+        }
         // Clear form fields after successful submission
         setFormData({
           productName: '',
@@ -91,10 +120,16 @@ const UserDetail = (props) => {
           productDescription: '',
           productImage: null,
         });
+        // Clear any previous errors
+        setErrors({});
       })
       .catch(err => {   // We'll get a HTTP 400 if any fields are missing. From there we'll set error messages from the API.
         console.error('Error uploading product:', err);
-        setErrors(err.response.data.error);
+        if (err.response?.data?.error) {
+          setErrors(err.response.data.error);
+        } else {
+          setErrors({ submit: 'An unexpected error occurred while uploading the product.' });
+        }
       });
   };
 
@@ -105,12 +140,47 @@ const UserDetail = (props) => {
       .then(response => {
         console.log("From UserDetail.jsx - The response we got back was ", response);
         setProducts(products.filter(product => product.productid !== productId));           // Deleting product from state
-        toastService[response.data.status](response.data.message);
+        if (response.data && response.data.status) {
+          toastService[response.data.status](response.data.message);
+        } else {
+          toastService.success("Product deleted successfully");
+        }
       })
       .catch(err => {
         console.error('Error deleting product:', err);
         toastService.error("Error deleting product");
       });
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container text-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="mt-3">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="container text-center mt-5">
+        <h2 className="text-danger mb-4">Error Loading Profile</h2>
+        <p className="lead mb-4">{error}</p>
+        <button 
+          className="btn btn-primary me-2" 
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+        <a href="/" className="btn btn-secondary">
+          Go Back Home
+        </a>
+      </div>
+    );
   }
 
   return (
@@ -121,30 +191,37 @@ const UserDetail = (props) => {
           {/* Left column: User's products */}
           <div className="col-6">
             <h2 className="mb-5">{user.firstname} {user.lastname}'s Products</h2>
-            {Object.values(products).map(product => (
-              <div key={product.productid} className="mb-5">
-                {product.image && (
-                  <>
-                    <img 
-                      src={`data:image/jpeg;base64,${product.image}`} 
-                      alt={product.name} 
-                    /><br />
-                    <div className = "mt-4">
-                      <a className="btn btn-primary" href={`/product/${product.productid}`}>
-                        {product.productname}
-                      </a>
-                      <span className="badge ml-3">Price: ${product.price}.00</span>
-                      <span className="badge ml-3">
-                        {/* <a href={`/product/${product.productid}/delete`}>Delete?</a> */}
-                        <a href="#" onClick={(e) => {
-                            e.preventDefault();                                 // Have this do a POST request to the delete endpoint
-                            handleDelete(product.productid);}}>Delete?</a>
-                      </span>
-                    </div>
-                  </>
-                )}
+            {products.length === 0 ? (
+              <div className="text-muted">
+                <p>You haven't listed any products yet.</p>
+                <p>Use the form on the right to add your first product!</p>
               </div>
-            ))}
+            ) : (
+              Object.values(products).map(product => (
+                <div key={product.productid} className="mb-5">
+                  {product.image && (
+                    <>
+                      <img 
+                        src={`data:image/jpeg;base64,${product.image}`} 
+                        alt={product.name} 
+                      /><br />
+                      <div className = "mt-4">
+                        <a className="btn btn-primary" href={`/product/${product.productid}`}>
+                          {product.productname}
+                        </a>
+                        <span className="badge ml-3">Price: ${product.price}.00</span>
+                        <span className="badge ml-3">
+                          {/* <a href={`/product/${product.productid}/delete`}>Delete?</a> */}
+                          <a href="#" onClick={(e) => {
+                              e.preventDefault();                                 // Have this do a POST request to the delete endpoint
+                              handleDelete(product.productid);}}>Delete?</a>
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))
+            )}
           </div>
           {/* Right column: New product listing form */}
           <div className="col-6 text-left">

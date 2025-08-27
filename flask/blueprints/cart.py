@@ -75,6 +75,11 @@ def addtocart(productid):
     print("From /addtocart route, userid is: ", userid)
 
     if userid:                              # If user is logged in, then they can add to cart
+        # Check if the product exists
+        product = Product.query.get(productid)
+        if not product:
+            return jsonify({'status': 'error', 'message': 'Product not found'}), 404
+        
         try:                                # Because we will have nothing in the cart initially, we'll just initialize it in the except block
             products = session['cart']
             products.append(productid)
