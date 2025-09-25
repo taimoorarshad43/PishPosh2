@@ -201,5 +201,5 @@ GET /v1/tag/<tagID>
 
 ## Dataflow
 
-![PishPosh Dataflow](images/pishposh_data_diagram.png)
+![PishPosh Dataflow](images/database_flow_diagram.png)
 <br></br>
