@@ -12,6 +12,7 @@ const Cart = (props) => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
   const toastId = React.useRef(null);
+  const BASE_URL = 'http://127.0.0.1:5000';
 
 
   // If we're not logged in, then we don't have a username and we need to be redirected to index
@@ -28,7 +29,7 @@ const Cart = (props) => {
   // Get product data from cart endpoint and set products
   useEffect(() => {
     const getProducts = async () => {
-      const response = await axios.get('http://127.0.0.1:5000/cart', { withCredentials: true });
+      const response = await axios.get(`${BASE_URL}/cart`, { withCredentials: true });
       const data = await response.data;
       console.log("From Cart.jsx - the data is", data);
         if(data){

@@ -21,8 +21,10 @@ def getrelatedproducts(productid):
     """
     Get related products based on the product ID.
     """
-    # # Fetch the product from the database
-    # product = Product.query.get_or_404(productid)
+    # Check if the product exists first
+    product = Product.query.get(productid)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
 
     productlimit = 4
 
@@ -43,6 +45,8 @@ def getrelatedproducts(productid):
 def deleteproduct(productid):
 
     product = Product.query.get(productid)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
 
     try:
         db.session.delete(product)

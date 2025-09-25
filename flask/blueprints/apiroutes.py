@@ -22,6 +22,9 @@ def getusers():
 def getsingleuser(userid):
 
     user = User.query.get(userid)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
     params = ['id', 'username', 'firstname', 'lastname']
     user = serialize(user, params)
 
@@ -31,6 +34,8 @@ def getsingleuser(userid):
 def getsingleuserproducts(userid):
 
     user = User.query.get(userid)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
     userproducts = []
 
@@ -60,6 +65,9 @@ def getproducts():
 def getsingleproduct(productid):
 
     product = Product.query.get(productid)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+    
     params = ['productid', 'productname', 'productdescription', 'price', 'user_id']
     product = serialize(product, params)
 
@@ -90,6 +98,9 @@ def getsingleproductimages(productid):
     """
 
     product = Product.query.get(productid)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+    
     username = product.user.username
     product.username = username
     product.image = product.decode_image()

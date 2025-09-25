@@ -101,6 +101,7 @@ def aiprocess():
     img_data = encodeimage(image)               # Need both an encoded and decoded image for the HTML and API calls respectively
     img_data_decoded = decodeimage(img_data)
 
+    # Temporarily changed to use the encoded image for the API call
     title = getproductdescription(img_data_decoded, title_prompt)     # Get both the title and description from Mistral AI
     sleep(2) # To avoid Mistral API's rate limit
     description = getproductdescription(img_data_decoded, description_prompt)

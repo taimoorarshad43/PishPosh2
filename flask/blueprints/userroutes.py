@@ -130,6 +130,25 @@ def login():
         session['userid'] = user.id
         session.modified = True
         user = user.username
+        
+        # Enhanced debugging
+        print(f"Session after setting: {dict(session)}")
+        print(f"Session ID cookie: {request.cookies.get('session')}")
+        print(f"All cookies: {dict(request.cookies)}")
+        print(f"Response cookies: {dict(request.cookies)}")
+        
+        # Check Flask's default session cookie name
+        from flask import current_app
+        print(f"SECRET_KEY: {current_app.config.get('SECRET_KEY')}")
+        print(f"SESSION_COOKIE_NAME: {current_app.config.get('SESSION_COOKIE_NAME', 'session')}")
+        
+        # Check if session cookie exists with different names
+        print(f"All request cookies: {[name for name in request.cookies.keys()]}")
+        
+        # Check if session is actually being stored
+        print(f"Session object type: {type(session)}")
+        print(f"Session object: {session}")
+        
     else:
         return jsonify("null")
     
@@ -207,3 +226,18 @@ def deleteuser(userid):
 
 
 ################################################################################################################################################
+
+@userroutes.route('/test-session')
+def test_session():
+    """Test if Flask sessions are working at all"""
+    session['test'] = 'hello'
+    session.modified = True
+    
+    print(f"Test session set: {dict(session)}")
+    print(f"All cookies in test: {dict(request.cookies)}")
+    
+    return jsonify({
+        'session_data': dict(session),
+        'cookies': dict(request.cookies),
+        'session_object': str(session)
+    })

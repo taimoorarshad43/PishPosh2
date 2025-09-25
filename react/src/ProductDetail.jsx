@@ -10,21 +10,43 @@ const ProductDetail = () => {
   const { productid } = useParams();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch product data when the component mounts or productid changes
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        setNotFound(false);
+        
         const response = await axios.get(`http://127.0.0.1:5000/v1/productsimages/${productid}`, {withCredentials: true});
-        if (response) {
-          const data = await response.data;
+        if (response && response.data && response.data.Product) {
+          const data = response.data;
           console.log(data)
           setProduct(data.Product);
         } else {
-          console.error('Failed to fetch product data');
+          console.error('Failed to fetch product data: Invalid response format');
+          setError('Invalid response format from server');
         }
       } catch (error) {
         console.error('Error fetching product data:', error);
+        
+        if (error.response?.status === 404) {
+          setNotFound(true);
+        } else if (error.response?.status >= 500) {
+          setError('Server error occurred. Please try again later.');
+        } else if (error.response?.status >= 400) {
+          setError('Bad request. Please check the product ID.');
+        } else if (error.code === 'NETWORK_ERROR') {
+          setError('Network error. Please check your connection.');
+        } else {
+          setError('An unexpected error occurred while loading the product.');
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,21 +58,23 @@ const ProductDetail = () => {
     const fetchRelatedProduct = async () => {
       try {
         const response = await axios.post(`http://127.0.0.1:5000/product/${productid}/related`, {}, {withCredentials: true});
-        if (response) {
-          const data = await response.data;
+        if (response && response.data && response.data.RelatedProducts) {
+          const data = response.data;
           console.log(data)
           setRelatedProducts(data.RelatedProducts);
         } else {
-          console.error('Failed to fetch product data');
+          console.error('Failed to fetch related products: Invalid response format');
+          setRelatedProducts([]);
         }
       } catch (error) {
-        console.error('Error fetching product data:', error);
+        console.error('Error fetching related products:', error);
+        // Don't set error for related products, just set empty array
+        setRelatedProducts([]);
       }
     };
 
     fetchRelatedProduct();
   }, [productid]);
-
 
   // Handler to add product to the cart using a POST request.
   const handleAddToCart = async () => {
@@ -91,9 +115,72 @@ const ProductDetail = () => {
 
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container text-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="mt-3">Loading product details...</p>
+      </div>
+    );
+  }
+
+  // Show 404 state
+  if (notFound) {
+    return (
+      <div className="container text-center mt-5">
+        <h1 className="display-1 text-muted">404</h1>
+        <h2 className="mb-4">Product Not Found</h2>
+        <p className="lead mb-4">
+          The product you're looking for doesn't exist or has been removed.
+        </p>
+        <Link to="/" className="btn btn-primary">
+          Browse Other Products
+        </Link>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="container text-center mt-5">
+        <h2 className="text-danger mb-4">Error Loading Product</h2>
+        <p className="lead mb-4">{error}</p>
+        <button 
+          className="btn btn-primary me-2" 
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+        <Link to="/" className="btn btn-secondary">
+          Browse Other Products
+        </Link>
+      </div>
+    );
+  }
+
   // If product data hasn't loaded yet, display a loading message.
   if (!product) {
-    return <div>Loading...</div>;
+    return (
+      <div className="container text-center mt-5">
+        <h2 className="text-warning mb-4">Product Not Available</h2>
+        <p className="lead mb-4">
+          Unable to load product details. Please try again later.
+        </p>
+        <button 
+          className="btn btn-primary me-2" 
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+        <Link to="/" className="btn btn-secondary">
+          Browse Other Products
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -130,48 +217,34 @@ const ProductDetail = () => {
         </Row>
       </Container>
 
-      {/*        */}
-
-      {/* <Container>
-      <div className="text-center mt-5">
-        <h2>Product Suggestions</h2>
-        <p>Suggestions will be displayed here.</p>
-      </div>
-      </Container> */}
-
-      {/* Product Suggestions Section */}
-
-      <Container className="mt-5">
-        <div className="text-center mb-4">
-          <h2>Product Suggestions</h2>
-        </div>
-        <Row>
-          {Object.values(relatedProducts).map((p) => (
-            <Col key={p.id} md={3} className="d-flex flex-column align-items-center mb-4">
-              <Image
-                src={`data:image/jpeg;base64,${p.image}`}
-                alt={p.productname}
-                rounded
-                fluid
-                style={{ maxHeight: '150px', objectFit: 'cover' }}
-                className="mb-2"
-              />
-              <h6 className="text-center">{p.productname}</h6>
-              <Button
-                as={Link}
-                to={`/product/${p.productid}`}
-                variant="outline-primary"
-                className="mt-auto"
-              >
-                View Product
-              </Button>
-            </Col>
-          ))}
-        </Row>
-      </Container>
-  
-      {/*       */}
-
+      {/* Related Products Section */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <Container className="mt-5">
+          <h3 className="text-center mb-4">Related Products</h3>
+          <Row className="text-center">
+            {relatedProducts.map(relatedProduct => (
+              <Col md={3} key={relatedProduct.productid} className="mb-3">
+                {relatedProduct.image && (
+                  <Image
+                    src={`data:image/jpeg;base64,${relatedProduct.image}`}
+                    alt={relatedProduct.productname}
+                    fluid
+                    className="mb-2"
+                  />
+                )}
+                <Button
+                  variant="outline-primary"
+                  href={`/product/${relatedProduct.productid}`}
+                  size="sm"
+                >
+                  {relatedProduct.productname}
+                </Button>
+                <p className="mt-2">${relatedProduct.price}.00</p>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      )}
     </>
   );
 };
