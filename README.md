@@ -196,7 +196,7 @@ GET /v1/tag/<tagID>
 
 ## Tech Stack
 
-![PishPosh Tech Stack](images/pishposh_techstack.png)
+![PishPosh Tech Stack](images/pishposh2_techstack_diagram.png)
 <br></br>
 
 ## Dataflow
