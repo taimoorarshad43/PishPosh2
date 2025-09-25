@@ -184,12 +184,12 @@ GET /v1/tag/<tagID>
 
 ### Buying Flow
 
-![PishPosh User Buying Flow](images/pishposh_buying_flow.png)
+![PishPosh User Buying Flow](images/pishposh2_buying_flow.png)
 <br></br>
 
 ### Selling Flow
 
-![PishPosh User Selling Flow](images/pishposh_selling_flow.png)
+![PishPosh User Selling Flow](images/pishposh2_selling_flow.png)
 <br></br>
 
 
